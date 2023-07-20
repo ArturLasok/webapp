@@ -3,14 +3,14 @@ Aplikacja do tworzenia stron internetowych / Website development application
 
 Aplikacja wielomodułowa do tworzenia strona internetowych. 
 
-Moduł :app ( MainActivity, BaseApplication, Hilt/ Module, Compose navigation, Network monitoring, Init )
- | |
-Moduł :feature_core ( DataStoreInteraction, StartScreen, SettingsScreen )
-Moduł :feature_auth (  )
+|--- Moduł :app ( MainActivity, BaseApplication, Hilt/ Module, Compose navigation, Network monitoring, Init ) <br>
+| <br>
+|--- Moduł :feature_core ( DataStoreInteraction, StartScreen, SettingsScreen ) <br>
+|--- Moduł :feature_auth (  ) <br>
 
-//TODO next
--> Firebase auth & Ktor auth
--> Compose Ui 
--> Room for caching
--> Ktor api ( MongoDB )
--> :feature_creator 
+//TODO next <br>
+-> Firebase auth & Ktor auth <br>
+-> Compose Ui <br>
+-> Room for caching <br>
+-> Ktor api ( MongoDB ) <br>
+-> :feature_creator <br>
