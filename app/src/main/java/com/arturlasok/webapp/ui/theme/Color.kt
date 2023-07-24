@@ -74,7 +74,7 @@ val Light_primary = Color(0xFF939BCA)
 val Light_on_primary = Color(0xFF13172E)
 val Light_primary_variant = Color(0xFF45637A)
 
-val Light_secondary = Color(0xFFEBECEB)
+val Light_secondary = Color(0xFFC7CCE7)
 val Light_on_secondary = Color(0xFF004386)
 
 val Light_background = Color(0xFFFFFFFF)
@@ -90,8 +90,8 @@ val Dark_primary = Color(0xFF000000)
 val Dark_on_primary = Color(0xFFE7E7E7)
 val Dark_primary_variant = Color(0xFF0B3353)
 
-val Dark_secondary = Color(0xFFFFD6FA)
-val Dark_on_secondary = Color(0xFF281D29)
+val Dark_secondary = Color(0xFF000000)
+val Dark_on_secondary = Color(0xFFE7E7E7)
 
 val Dark_background = Color(0xFF2E2B2B)
 val Dark_on_background = Color(0xFF939BCA)

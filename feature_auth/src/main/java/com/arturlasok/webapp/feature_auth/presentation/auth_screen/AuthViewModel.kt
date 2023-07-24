@@ -1,9 +1,10 @@
-package com.arturlasok.webapp.feature_auth.presentation
+package com.arturlasok.webapp.feature_auth.presentation.auth_screen
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.arturlasok.feature_core.util.isOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -11,6 +12,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val application: Application,
+    private val isOnline: isOnline
 
 
 ) : ViewModel() {
@@ -18,6 +20,8 @@ class AuthViewModel @Inject constructor(
 
 
     val applications = mutableStateOf(application)
-
+    fun haveNetwork() : Boolean {
+        return isOnline.isNetworkAvailable.value
+    }
 
 }

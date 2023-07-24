@@ -51,7 +51,7 @@ private val LightColorPalette = lightColors(
 )
 
 //gradient background for themes
-val lightBackgroundColorsList = listOf(Color(0xFFC7CCE7), Color(0xFFFFEBFA))
+val lightBackgroundColorsList = listOf(Color(0xFFC7CCE7), Color(0xFFFFFFFF))
 val darkBackgroundColorList = listOf( Color(0xFF000000), Color(0xFF181414))
 
 val lightGradient = Brush.verticalGradient(

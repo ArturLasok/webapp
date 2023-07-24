@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    //implementation(project(Modules.feature_auth))
 
     //DataStore
     implementation(AndroidX.dataStoreCore)

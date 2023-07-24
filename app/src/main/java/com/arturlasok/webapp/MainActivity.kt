@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -17,16 +19,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.webapp.navigation.NavigationComponent
 import com.arturlasok.webapp.ui.theme.WebAppTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Datastore init
-//val Context.udataStore: DataStore<Preferences> by preferencesDataStore(name = "ustawienia")
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -34,6 +37,11 @@ class MainActivity : ComponentActivity() {
     //Internet Monitor
     @Inject
     lateinit var isOnline: isOnline
+    //DataStore interaction
+    @Inject
+    lateinit var dataStoreInteraction: DataStoreInteraction
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +51,9 @@ class MainActivity : ComponentActivity() {
         val darkThemeIntFromDataStore = mutableStateOf(0)
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-               //TODO get theme int
+               dataStoreInteraction.getDarkThemeInt().onEach {darkValue->
+                   darkThemeIntFromDataStore.value = darkValue
+               }.launchIn(this)
             }
         }
         //run monitor
@@ -67,19 +77,22 @@ class MainActivity : ComponentActivity() {
             //app theme
             WebAppTheme(
                 systemUiController = systemUiController,
-                setBackgroundGradient = { brush -> selectedBackgroundGradient = brush }) {
+                setBackgroundGradient = { brush -> selectedBackgroundGradient = brush },
+                darkTheme = darkThemeIntFromDataStore.value
+                ) {
 
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(selectedBackgroundGradient)
-                        .padding(start = statusBarPaddingLeft.dp,top = statusBarPaddingTop.dp)
-                ) {
-                    NavigationComponent(
-                        navHostController = navController,
-                        internetAvailable = isOnline.isNetworkAvailable.value
+                        .background(MaterialTheme.colors.background)
 
-                    )
+                ) {
+
+                        NavigationComponent(
+                            navHostController = navController,
+                            modifierTopBar = Modifier.background(MaterialTheme.colors.secondary).fillMaxWidth().padding(start = statusBarPaddingLeft.dp),
+                            modifierScaffold = Modifier.padding(start = statusBarPaddingLeft.dp, top = statusBarPaddingTop.dp)
+                        )
 
                 }
             }

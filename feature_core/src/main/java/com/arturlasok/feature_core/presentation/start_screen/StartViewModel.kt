@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
+import com.arturlasok.feature_core.util.isOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -15,7 +16,8 @@ import javax.inject.Inject
 class StartViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val application: Application,
-    private val dataStoreInteraction: DataStoreInteraction
+    private val dataStoreInteraction: DataStoreInteraction,
+    private val isOnline: isOnline
 ) : ViewModel() {
 
     val applications = mutableStateOf(application)
@@ -23,11 +25,8 @@ class StartViewModel @Inject constructor(
     fun darkFromStore() : Flow<Int> {
         return dataStoreInteraction.getDarkThemeInt()
     }
-    fun setDark(value:Int) {
-        viewModelScope.launch{
-            dataStoreInteraction.setDarkThemeInt(value)
-        }
-
+    fun haveNetwork() : Boolean {
+        return isOnline.isNetworkAvailable.value
     }
 
 }

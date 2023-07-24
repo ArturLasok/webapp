@@ -19,7 +19,6 @@ class isOnline
 constructor(
     application: Application,
 ) {
-
     val validNetworks: MutableSet<Network> = HashSet()
     val isNetworkAvailable = mutableStateOf(false)
     val cm = application.getSystemService(ComponentActivity.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
