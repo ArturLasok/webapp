@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     kotlin(KotlinPlugins.serialization) version Kotlin.version
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -31,21 +32,38 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
-
+        getByName("debug") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
     compileOptions {
 
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 dependencies {
-
+    implementation("androidx.compose.runtime:runtime:1.4.3")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation(platform("androidx.compose:compose-bom:2022.10.00"))
     //Modules to :app
-    implementation(project(Modules.feature_core))
-    implementation(project(Modules.feature_auth))
+//    implementation(project(Modules.feature_core))
+  //  implementation(project(Modules.feature_auth))
     //Compose
     implementation(Compose.composeUi)
     implementation(Compose.composeUiTooling)
@@ -66,12 +84,18 @@ dependencies {
     implementation(Hilt.hiltAndroid)
     kapt(Hilt.hiltKapt)
     //CoreKtx
-    implementation(AndroidX.coreKtx)
-
-
+   // implementation(AndroidX.coreKtx)
+    //Firebase
+    implementation(platform(Firebase.firebaseBom))
+    implementation(Firebase.firebaseAnalytics)
+    implementation(Firebase.firebaseAuth)
+    //vm lifecycle
+   // implementation(AndroidX.lifeCyc)
+    //implementation(AndroidX.lifeCycVm)
+    //implementation(AndroidX.lifektx)
 
     //Test
-
+/*
     // Core library
     val androidXTestVersion = "1.5.0"
     androidTestImplementation("androidx.test:core:$androidXTestVersion")
@@ -97,7 +121,10 @@ dependencies {
     androidTestImplementation( "androidx.test.espresso:espresso-web:$espressoVersion")
     androidTestImplementation( "androidx.test.espresso.idling:idling-concurrent:$espressoVersion")
     androidTestImplementation( "androidx.test.espresso:espresso-idling-resource:$espressoVersion")
+   */
 }
+
+
 // Allow references to generated code
 kapt {
     correctErrorTypes = true

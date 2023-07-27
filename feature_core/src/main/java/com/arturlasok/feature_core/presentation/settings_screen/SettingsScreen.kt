@@ -33,11 +33,8 @@ fun SettingsScreen(
         topBar = {
             //Back button //Top menu
             Row(modifierTopBar) {
-
                 TopBack { navigateTo(Screen.StartScreen.route) }
                 TopNetwork(isNetworkAvailable = settingsViewModel.haveNetwork())
-
-
             }
         },
         bottomBar ={
@@ -51,7 +48,7 @@ fun SettingsScreen(
                     text = "Settings Screen"
                 )
 
-
+                Text(text = "ss: "+settingsViewModel.getStateInfo())
                 Text(
                     color = MaterialTheme.colors.onBackground,
                     text = "datastore dark theme:" + dataStoreDarkTheme.value

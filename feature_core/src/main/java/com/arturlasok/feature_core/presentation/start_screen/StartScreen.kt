@@ -1,5 +1,6 @@
 package com.arturlasok.feature_core.presentation.start_screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ fun StartScreen(
     modifierTopBar: Modifier,
     modifierScaffold: Modifier
 ) {
+
     val dataStoreDarkTheme = startViewModel.darkFromStore().collectAsState(initial = 0)
     val scaffoldState = rememberScaffoldState()
     Scaffold(
@@ -50,8 +52,10 @@ fun StartScreen(
         Box(modifier = modifierScaffold.padding(paddingValues)) {
 
            Column() {
-
-               Text("Start Screen // "+"DT:"+dataStoreDarkTheme.value)
+               Text(text = "SSH keys: "+startViewModel.getStateInfo(), modifier = Modifier.clickable(onClick = {
+                   startViewModel.setTest("TEST!!!")
+               }))
+               Text("Start Screen test: ${startViewModel.getTest()}")
            }
 
 

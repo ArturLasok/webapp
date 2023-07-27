@@ -3,13 +3,14 @@ package com.arturlasok.webapp.navigation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.arturlasok.feature_core.navigation.Screen
-import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
-import com.arturlasok.feature_core.presentation.start_screen.StartScreen
-import com.arturlasok.webapp.feature_auth.presentation.auth_screen.AuthScreen
+//import com.arturlasok.feature_core.navigation.Screen
+//import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
+//import com.arturlasok.feature_core.presentation.start_screen.StartScreen
+//import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
 
 @Composable
 fun NavigationComponent(
@@ -17,6 +18,7 @@ fun NavigationComponent(
     modifierTopBar: Modifier,
     modifierScaffold: Modifier
 ) {
+    /*
     NavHost(
         navController = navHostController,
         startDestination = Screen.StartScreen.route,
@@ -54,11 +56,11 @@ fun NavigationComponent(
 
 
         }
-        // Auth Screen
+        // Login Screen
         composable(
             route= Screen.AuthScreen.route) {
             Column() {
-               AuthScreen(
+               LoginScreen(
                    navigateTo = { route-> navHostController.navigate(route)},
                    modifierTopBar = modifierTopBar,
                    modifierScaffold = modifierScaffold,
@@ -71,4 +73,6 @@ fun NavigationComponent(
         }
 
     }
+
+     */
 }

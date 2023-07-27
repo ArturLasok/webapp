@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     kotlin(KotlinPlugins.serialization) version Kotlin.version
+    //id("com.google.gms.google-services")
 }
 
 android {
@@ -24,13 +25,14 @@ android {
         kotlinCompilerExtensionVersion = Compose.composeKotlinCompilerVersion
     }
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -58,5 +60,13 @@ dependencies {
     implementation(Compose.composeFundation)
     implementation(Compose.composeMaterial)
     //coreKtx
-    implementation(AndroidX.coreKtx)
+    //implementation(AndroidX.coreKtx)
+    //Firebase
+    implementation(platform(Firebase.firebaseBom))
+    implementation(Firebase.firebaseAnalytics)
+    implementation(Firebase.firebaseAuth)
+    //vm lifecycle
+    //implementation(AndroidX.lifeCyc)
+   // implementation(AndroidX.lifeCycVm)
+   // implementation(AndroidX.lifektx)
 }

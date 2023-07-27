@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     kotlin(KotlinPlugins.serialization) version Kotlin.version
+    //id("com.google.gms.google-services")
 }
 
 android {
@@ -24,13 +25,10 @@ android {
         kotlinCompilerExtensionVersion = Compose.composeKotlinCompilerVersion
     }
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -49,14 +47,23 @@ dependencies {
     implementation(Hilt.hiltAndroid)
     kapt(Hilt.hiltKapt)
     //CoreKtx
-    implementation(AndroidX.coreKtx)
+    //implementation(AndroidX.coreKtx)
     //Compose
     implementation(Compose.activityCompose)
     implementation(Compose.composeUi)
     implementation(Compose.composeUiTooling)
     implementation(Compose.composeFundation)
     implementation(Compose.composeMaterial)
-
+    implementation(Compose.activityCompose)
+    implementation(Compose.navigationCompose)
+    //Firebase
+    implementation(platform(Firebase.firebaseBom))
+    implementation(Firebase.firebaseAnalytics)
+    implementation(Firebase.firebaseAuth)
+    //vm lifecycle
+   // implementation(AndroidX.lifeCyc)
+   // implementation(AndroidX.lifeCycVm)
+   // implementation(AndroidX.lifektx)
 }
 // Allow references to generated code
 kapt {
