@@ -1,6 +1,7 @@
 package com.arturlasok.feature_core.presentation.settings_screen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.TopBack
 import com.arturlasok.feature_core.presentation.components.TopNetwork
@@ -22,6 +23,8 @@ import com.arturlasok.feature_core.presentation.components.TopNetwork
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigateTo: (route: String) -> Unit,
+    navigateUp:()->Unit,
+    navScreenLabel: String = "",
     modifierTopBar: Modifier,
     modifierScaffold: Modifier
 ) {
@@ -32,9 +35,19 @@ fun SettingsScreen(
         snackbarHost =  { scaffoldState.snackbarHostState },
         topBar = {
             //Back button //Top menu
-            Row(modifierTopBar) {
-                TopBack { navigateTo(Screen.StartScreen.route) }
-                TopNetwork(isNetworkAvailable = settingsViewModel.haveNetwork())
+            Row(modifierTopBar,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween)
+            {
+                //Front
+                Row {
+                    TopBack(isHome = false, routeLabel = navScreenLabel) { navigateUp() }
+                }
+                //End
+                Row {
+                    TopNetwork(isNetworkAvailable = settingsViewModel.haveNetwork())
+                }
+
             }
         },
         bottomBar ={
@@ -44,11 +57,7 @@ fun SettingsScreen(
         // data store for dark theme
         Box(modifier = modifierScaffold.padding(paddingValues)) {
             Column() {
-                Text(
-                    text = "Settings Screen"
-                )
 
-                Text(text = "ss: "+settingsViewModel.getStateInfo())
                 Text(
                     color = MaterialTheme.colors.onBackground,
                     text = "datastore dark theme:" + dataStoreDarkTheme.value

@@ -5,7 +5,7 @@ object AndroidX {
     const val dataStorePreferences = "androidx.datastore:datastore-preferences:$dataStoreVersion"
     const val dataStoreCore = "androidx.datastore:datastore-core:$dataStoreVersion"
 
-    private const val appCompatVersion = "1.6.1"
+    private const val appCompatVersion = "1.5.1"
 
     const val appCompat = "androidx.appcompat:appcompat:$appCompatVersion"
 

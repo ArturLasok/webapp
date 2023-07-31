@@ -6,11 +6,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
-import com.arturlasok.feature_core.util.SavedStateHandlerInteraction
 import com.arturlasok.feature_core.util.isOnline
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ class SettingsViewModel @Inject constructor(
     private val application: Application,
     private val dataStoreInteraction: DataStoreInteraction,
     private val isOnline: isOnline,
-   // private val savedStateHandlerInteraction: SavedStateHandlerInteraction
+
 ) : ViewModel() {
 
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_rememberQuestion">Remember my email and password</string>
+    <string name="auth_dontRememberPassword">Forgot Password?</string>
+    <string name="auth_register">Don\'t have an account? Sign up</string>
+    <string name="auth_loginButton">Log In</string>
+    <string name="auth_validEmailLike">A valid email like: address@example.com</string>
+    <string name="auth_yourEmail">Your email</string>
+    <string name="auth_clear">Clear</string>
+    <string name="auth_validPassLike">Valid password have more then 8 chars</string>
+    <string name="auth_yourPassword">Your password</string>
+    <string name="auth_visibility">Visibility change</string>
+    <string name="auth_signupButton">Sign up</string>
+    <string name="auth_policy">By signing up you agree to the Terms of Service and Privacy Policy</string>
+</resources>

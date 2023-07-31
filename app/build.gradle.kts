@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -16,6 +17,8 @@ android {
         targetSdk = Android.targetSdk
         versionCode = Android.versionCode
         versionName = Android.versionName
+
+        multiDexEnabled = true
     }
     buildFeatures {
         compose = true
@@ -47,23 +50,31 @@ android {
     }
     compileOptions {
 
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "11"
+    }
+    kotlin {
+        jvmToolchain {
+            this.languageVersion.set(JavaLanguageVersion.of(11))
+        }
     }
 }
 
 dependencies {
-    implementation("androidx.compose.runtime:runtime:1.4.3")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+    //implementation("com.android.support:multidex:1.0.3")
+    implementation("androidx.compose.runtime:runtime:1.2.1")
+    //kapt("androidx.hilt:hilt-compiler:1.0.0")
+    //implementation("androidx.core:core-ktx:1.10.1")
+
+   // implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation(platform("androidx.compose:compose-bom:2022.10.00"))
     //Modules to :app
-//    implementation(project(Modules.feature_core))
-  //  implementation(project(Modules.feature_auth))
+    implementation(project(Modules.feature_core))
+    implementation(project(Modules.feature_auth))
     //Compose
     implementation(Compose.composeUi)
     implementation(Compose.composeUiTooling)
