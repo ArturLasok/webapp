@@ -5,5 +5,6 @@ data class AuthLoginDataState(
     val authPassword : String = "",
     val authPasswordRepeat : String = "",
     val authPasswordVisibility : Boolean = false,
-    val authRememberUser: Boolean = false
+    val authRememberUser: Boolean = false,
+    val authIsPasswordTheSame: Boolean = true,
 )

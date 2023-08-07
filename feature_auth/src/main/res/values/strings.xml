@@ -3,13 +3,35 @@
     <string name="auth_rememberQuestion">Remember my email and password</string>
     <string name="auth_dontRememberPassword">Forgot Password?</string>
     <string name="auth_register">Don\'t have an account? Sign up</string>
+    <string name="auth_registerShort">Sign up</string>
     <string name="auth_loginButton">Log In</string>
+    <string name="auth_loginForm">Log In Form</string>
     <string name="auth_validEmailLike">A valid email like: address@example.com</string>
     <string name="auth_yourEmail">Your email</string>
     <string name="auth_clear">Clear</string>
-    <string name="auth_validPassLike">Valid password have more then 8 chars</string>
+    <string name="auth_validPassLike">Password must contain at least 10 characters</string>
     <string name="auth_yourPassword">Your password</string>
+    <string name="auth_yourPasswordR">Repeat password</string>
     <string name="auth_visibility">Visibility change</string>
     <string name="auth_signupButton">Sign up</string>
+    <string name="auth_signupForm">Sign up form</string>
     <string name="auth_policy">By signing up you agree to the Terms of Service and Privacy Policy</string>
+    <string name="auth_notSamePasswords">The passwords must be the same</string>
+    <string name="auth_forgotButton">Request Password Reset</string>
+    <string name="auth_forgotButtonBack">Go back to Login</string>
+    <string name="auth_forgotForm">Forgot password form</string>
+    <string name="auth_forgotInfo">Enter the email address associated with your account and we will send you a link to reset your password.</string>
+    <string name="auth_profile_welcome">Welcome in!</string>
+    <string name="auth_form_error">The form contains errors. Please enter a valid email and your password.</string>
+    <string name="auth_somethingWrong">Something went wrong. Please try later.</string>
+    <string name="auth_fberror_internal">Internal error occurred.</string>
+    <string name="auth_fb_resetMailSended">A link to reset your password has been sent to your address. Check your e-mail (also Spam) and follow the instructions.</string>
+    <string name="auth_fb_resetMailSended_next">If you have followed the steps received in the e-mail to set a new password, then log in to the application using the new password.</string>
+    <string name="auth_email_form_error">The form contains errors. Please enter a valid email.</string>
+    <string name="auth_fberror_nouser">There is no user with the given email address and password.</string>
+    <string name="auth_fberror_inuse">The email address is already in use by another account.</string>
+    <string name="auth_fberror_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
+    <string name="auth_fberror_invalidpass">The password is incorrect. If you have forgotten your password, click \"Forgot Password?\"</string>
+    <string name="auth_fberror_blocked">Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.</string>
+
 </resources>

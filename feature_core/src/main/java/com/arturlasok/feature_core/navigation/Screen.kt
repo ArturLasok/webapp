@@ -14,6 +14,12 @@ sealed class  Screen(val route:String, val arguments: List<NamedNavArgument>, va
 
     object RegScreen:Screen("RegScreen", emptyList(),R.string.Screen_Reg)
 
+    object ForgotScreen:Screen("ForgotScreen", emptyList(),R.string.Screen_Forgot)
+
+    object ProfileScreen:Screen("ProfileScreen", emptyList(),R.string.Screen_Profile)
+
+
+
 }
 
 

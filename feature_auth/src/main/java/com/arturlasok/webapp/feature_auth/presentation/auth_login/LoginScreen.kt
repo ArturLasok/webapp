@@ -1,5 +1,6 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_login
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,21 +19,31 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.navigation.Screen
+import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
 import com.arturlasok.feature_core.presentation.components.TopBack
 import com.arturlasok.feature_core.presentation.components.TopNetwork
 import com.arturlasok.feature_core.presentation.components.TopSettings
+import com.arturlasok.feature_core.util.SnackType
+import com.arturlasok.feature_core.util.SnackbarController
+import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_core.util.snackMessage
+import com.arturlasok.webapp.feature_auth.model.AuthState
 import com.arturlasok.webapp.feature_auth.presentation.components.AuthButton
 import com.arturlasok.webapp.feature_auth.presentation.components.AuthCheckBox
 import com.arturlasok.webapp.feature_auth.presentation.components.EmailTextField
 import com.arturlasok.webapp.feature_auth.presentation.components.PasswordTextField
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -43,10 +54,32 @@ fun LoginScreen(
     modifierTopBar: Modifier,
     modifierScaffold: Modifier
 ) {
-
+    //TODO
+    //Go to profile after login with nav parameter inclusive true! because in other case you not be able to back to home screen
+    //
+    //snackbar controller
+    val snackbarController = SnackbarController(rememberCoroutineScope())
     val authLoginDataState = loginViewModel.authLoginDataState.value
-
+    val authState = loginViewModel.authState
     val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(key1 = authState.value, block = {
+    if(authState.value==AuthState.Success) {   navigateTo(Screen.ProfileScreen.route)  }
+    if(authState.value is AuthState.AuthError) {
+        snackMessage(
+            snackType = SnackType.ERROR,
+            message = (authState.value as AuthState.AuthError).message ?: UiText.StringResource(R.string.auth_somethingWrong,"asd").asString(loginViewModel.applicationContext.applicationContext),
+            actionLabel = "OK",
+            snackbarController =snackbarController,
+            scaffoldState =scaffoldState)
+        delay(2000)
+        authState.value = AuthState.Idle
+    }
+
+
+    })
+
+
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost =  { scaffoldState.snackbarHostState },
@@ -65,8 +98,6 @@ fun LoginScreen(
                     TopSettings( navigateTo = { route-> navigateTo(route)})
                     TopNetwork(isNetworkAvailable = loginViewModel.haveNetwork())
                 }
-
-
             }
         },
         bottomBar ={
@@ -75,14 +106,27 @@ fun LoginScreen(
     ) { paddingValues ->
 
         Box(modifier = modifierScaffold.padding(paddingValues)) {
+            DefaultSnackbar(
+                snackbarHostState = scaffoldState.snackbarHostState,
+                onDismiss = { scaffoldState.snackbarHostState.currentSnackbarData?.dismiss() },
+                modifier = Modifier
+                    .zIndex(1.0f)
+                    .padding(
+                        top = 1.dp
+                    )
+            )
             Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp))
                 Text(
-                    text = "Auth Login"
+                    text= UiText.StringResource(R.string.auth_loginForm,"asd").asString().uppercase(),
                 )
                 Spacer(modifier = Modifier
                     .fillMaxWidth()
@@ -104,6 +148,8 @@ fun LoginScreen(
                     authPassword = authLoginDataState.authPassword,
                     setAuthPassword = { password -> loginViewModel.setAuthPassword(password) },
                     passwordVisibility = authLoginDataState.authPasswordVisibility,
+                    isPasswordTheSame = true,
+                    isPasswordRepeatField = false,
                     setPasswordVisibility = {newVal ->  loginViewModel.setAuthPasswordVisibility(newVal)}
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -117,17 +163,30 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 AuthButton(
                     buttonText = UiText.StringResource(R.string.auth_loginButton,"asd").asString(),
-                    textPadding = 50.dp,
-                    buttonAction = {},
-                    buttonEnabled = true,
+                    textPadding = 80.dp,
+                    buttonAction = {
+                        authState.value = AuthState.Idle
+                        loginViewModel.login()
+                                   },
+                    buttonEnabled = loginViewModel.isLoginButtonEnabled(),
                     modifier = Modifier)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text= UiText.StringResource(R.string.auth_dontRememberPassword,"asd").asString(),
-                    style = MaterialTheme.typography.h3,
-                    textDecoration = TextDecoration.Underline,
-
-                )
+                Row {
+                    Text(
+                        text= UiText.StringResource(R.string.auth_registerShort,"asd").asString(),
+                        style = MaterialTheme.typography.h3,
+                        textDecoration = TextDecoration.Underline,
+                        modifier= Modifier.clickable(onClick = {navigateTo(Screen.RegScreen.route)})
+                    )
+                    //Spacer(modifier = Modifier.width(10.dp))
+                    Text("   ")
+                    Text(
+                        text = UiText.StringResource(R.string.auth_dontRememberPassword, "asd").asString(),
+                        style = MaterialTheme.typography.h3,
+                        textDecoration = TextDecoration.Underline,
+                        modifier= Modifier.clickable(onClick = {navigateTo(Screen.ForgotScreen.route)})
+                        )
+                }
             }
 
         }

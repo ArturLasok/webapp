@@ -12,15 +12,9 @@ class UstawieniaDataStore @Inject constructor(app: Application) {
 
     val DARK_OPT = intPreferencesKey("dark_theme_on")
 
-    val CONFIRM_TASK_STATUS = booleanPreferencesKey("confirm_task_status")
+    val MAIL_FOLLLOW = stringPreferencesKey("mail_follow")
 
-    val APP_ADDED_TO_AUTOSTART = booleanPreferencesKey("app_added_to_autostart")
+    val FIRST_LOGIN = booleanPreferencesKey("first_login")
 
-    val IS_APP_OPEN = booleanPreferencesKey("is_app_open")
 
-    val CONFIRM_TASK = intPreferencesKey("confirm_task")
-
-    val WIDGED_STORE = stringPreferencesKey("widged_store")
-
-    val WIDGET_INFO = booleanPreferencesKey("widget_info")
 }

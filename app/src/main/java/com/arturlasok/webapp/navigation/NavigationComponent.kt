@@ -12,7 +12,9 @@ import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
+import com.arturlasok.webapp.feature_auth.presentation.auth_profile.ProfileScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_reg.RegScreen
 
 @Composable
@@ -83,7 +85,7 @@ fun NavigationComponent(
 
 
         }
-        // Login Screen
+        // RegisterScreen
         composable(
             route= Screen.RegScreen.route) {
             Column() {
@@ -91,6 +93,40 @@ fun NavigationComponent(
                     navigateTo = { route-> navHostController.navigate(route)},
                     navigateUp = { navHostController.popBackStack()},
                     navScreenLabel = UiText.StringResource(Screen.RegScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+
+
+
+        }
+        // ForgotScreen
+        composable(
+            route= Screen.ForgotScreen.route) {
+            Column() {
+                ForgotScreen(
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.ForgotScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+
+
+
+        }
+        // ProfileScreen
+        composable(
+            route= Screen.ProfileScreen.route) {
+            Column() {
+                ProfileScreen(
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.ProfileScreen.label,"asd").asString(),
                     modifierTopBar = modifierTopBar,
                     modifierScaffold = modifierScaffold,
                 )

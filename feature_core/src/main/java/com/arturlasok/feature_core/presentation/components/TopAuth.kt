@@ -21,8 +21,13 @@ fun TopAuth(
 ) {
     IconButton(
         onClick = {
+            if(fireAuth.currentUser!=null) {
+                navigateTo(Screen.ProfileScreen.route)
+            } else {
                 navigateTo(Screen.AuthScreen.route)
-                  },
+            }
+
+        },
         modifier = Modifier.padding(0.dp)
     ) {
         Icon(

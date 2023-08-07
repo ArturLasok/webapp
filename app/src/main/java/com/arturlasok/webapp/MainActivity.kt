@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
         isOnline.runit()
         // Initialize Firebase Auth
         auth = Firebase.auth
-
+        auth.useAppLanguage()
         //padding top when landscape only
         var statusBarPaddingTop = 0
         var statusBarPaddingLeft = 6
