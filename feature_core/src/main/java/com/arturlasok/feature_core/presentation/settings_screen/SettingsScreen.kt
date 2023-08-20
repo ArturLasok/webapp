@@ -53,7 +53,8 @@ fun SettingsScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel) { navigateUp() }
+                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
                 Row {

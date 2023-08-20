@@ -2,6 +2,7 @@ package com.arturlasok.webapp
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -23,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
+import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.webapp.navigation.NavigationComponent
 import com.arturlasok.webapp.ui.theme.WebAppTheme
@@ -97,13 +100,13 @@ class MainActivity : ComponentActivity() {
 
 
                 ) {
-
+                    Log.i(TAG,"Main Recompose")
                     NavigationComponent(
                         navHostController = navController,
                         modifierTopBar = Modifier
                             .background(MaterialTheme.colors.surface)
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(60.dp)
                             .padding(start = statusBarPaddingLeft.dp),
                         modifierScaffold = Modifier.padding(
                             start = statusBarPaddingLeft.dp,

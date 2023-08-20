@@ -21,9 +21,11 @@ fun fireBaseErrors(errorString: String) : Int {
 
         errorString.contains("blocked") -> R.string.auth_fberror_blocked
 
+        errorString.contains("has been disabled") -> R.string.auth_fberror_disabled
+
         else -> R.string.auth_somethingWrong
 
-
+//has been disabled
     }
 
 }

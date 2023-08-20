@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.TopAuth
 import com.arturlasok.feature_core.presentation.components.TopBack
 import com.arturlasok.feature_core.presentation.components.TopNetwork
@@ -43,7 +44,8 @@ fun StartScreen(
 
                //Front
                 Row{
-                    TopBack(isHome = true, routeLabel = navScreenLabel) {}
+                    TopBack(isHome = true, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    { navigateTo(Screen.StartScreen.route) }
                 }
 
                 //End

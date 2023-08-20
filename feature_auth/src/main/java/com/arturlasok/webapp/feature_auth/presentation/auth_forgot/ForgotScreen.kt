@@ -64,7 +64,7 @@ fun ForgotScreen(
             snackMessage(
                 snackType = SnackType.ERROR,
                 message = UiText.StringResource(R.string.auth_fb_resetMailSended,"asd").asString(forgotViewModel.applicationContext.applicationContext),
-                actionLabel = "OK",
+                actionLabel =  UiText.StringResource(R.string.auth_ok,"asd").asString(forgotViewModel.applicationContext.applicationContext),
                 snackbarController =snackbarController,
                 scaffoldState =scaffoldState)
             //navigateTo(Screen.AuthScreen.route)
@@ -75,7 +75,7 @@ fun ForgotScreen(
             snackMessage(
                 snackType = SnackType.ERROR,
                 message = (authState.value as AuthState.AuthError).message ?: UiText.StringResource(R.string.auth_somethingWrong,"asd").asString(forgotViewModel.applicationContext.applicationContext),
-                actionLabel = "OK",
+                actionLabel = UiText.StringResource(R.string.auth_ok,"asd").asString(forgotViewModel.applicationContext.applicationContext),
                 snackbarController =snackbarController,
                 scaffoldState =scaffoldState)
             delay(2000)
@@ -98,7 +98,8 @@ fun ForgotScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel) { navigateUp() }
+                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
                 Row {

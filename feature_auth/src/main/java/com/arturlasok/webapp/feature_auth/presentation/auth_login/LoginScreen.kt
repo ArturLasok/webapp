@@ -54,10 +54,7 @@ fun LoginScreen(
     modifierTopBar: Modifier,
     modifierScaffold: Modifier
 ) {
-    //TODO
-    //Go to profile after login with nav parameter inclusive true! because in other case you not be able to back to home screen
-    //
-    //snackbar controller
+
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val authLoginDataState = loginViewModel.authLoginDataState.value
     val authState = loginViewModel.authState
@@ -69,7 +66,7 @@ fun LoginScreen(
         snackMessage(
             snackType = SnackType.ERROR,
             message = (authState.value as AuthState.AuthError).message ?: UiText.StringResource(R.string.auth_somethingWrong,"asd").asString(loginViewModel.applicationContext.applicationContext),
-            actionLabel = "OK",
+            actionLabel = UiText.StringResource(R.string.auth_ok,"asd").asString(loginViewModel.applicationContext.applicationContext),
             snackbarController =snackbarController,
             scaffoldState =scaffoldState)
         delay(2000)
@@ -91,7 +88,8 @@ fun LoginScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel) { navigateUp() }
+                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
                 Row {

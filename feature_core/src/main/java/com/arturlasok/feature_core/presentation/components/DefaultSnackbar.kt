@@ -1,5 +1,7 @@
 package com.arturlasok.feature_core.presentation.components
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -32,8 +34,10 @@ fun DefaultSnackbar(
                         text = data.message.substringAfter(">>>"),
                         style = MaterialTheme.typography.h4,
                         color = MaterialTheme.colors.onError,
-                        maxLines = 5
+                        maxLines = 5,
+                        modifier = Modifier.padding(bottom = 5.dp, top = 5.dp)
                     )
+
                 },
                 action = {
                     data.actionLabel?.let { actionLabel ->

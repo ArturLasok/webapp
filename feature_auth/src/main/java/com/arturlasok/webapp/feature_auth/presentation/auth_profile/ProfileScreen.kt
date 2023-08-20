@@ -1,22 +1,18 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,12 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_auth.R
+import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
 import com.arturlasok.feature_core.presentation.components.TopBack
+import com.arturlasok.feature_core.presentation.components.TopLogOut
 import com.arturlasok.feature_core.presentation.components.TopNetwork
-import com.arturlasok.feature_core.presentation.components.TopSettings
+import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_core.util.snackMessage
+import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 
 @Composable
 fun ProfileScreen(
@@ -44,6 +44,43 @@ fun ProfileScreen(
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val scaffoldState = rememberScaffoldState()
 
+    val interactionState = profileViewModel.profileInteractionState
+    LaunchedEffect(key1 = interactionState.value, block = {
+        when(interactionState.value) {
+            ProfileInteractionState.Idle -> {
+
+            }
+            is ProfileInteractionState.Interact -> {
+                (interactionState.value as ProfileInteractionState.Interact).action.invoke()
+            }
+            ProfileInteractionState.OnComplete -> {
+
+            }
+            is ProfileInteractionState.IsSuccessful ->{
+                snackMessage(
+                    snackType = SnackType.NORMAL,
+                    message = (interactionState.value as ProfileInteractionState.IsSuccessful).message,
+                    actionLabel = UiText.StringResource(R.string.auth_ok,"asd").asString(profileViewModel.applicationContext.applicationContext),
+                    snackbarController =snackbarController,
+                    scaffoldState =scaffoldState)
+                (interactionState.value as ProfileInteractionState.IsSuccessful).action.invoke()
+
+            }
+            is ProfileInteractionState.Error -> {
+                snackMessage(
+                    snackType = SnackType.ERROR,
+                    message = (interactionState.value as ProfileInteractionState.Error).message,
+                    actionLabel = UiText.StringResource(R.string.auth_ok,"asd").asString(profileViewModel.applicationContext.applicationContext),
+                    snackbarController =snackbarController,
+                    scaffoldState =scaffoldState)
+                (interactionState.value as ProfileInteractionState.Error).action.invoke()
+            }
+
+            else -> {
+
+            }
+        }
+    })
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost =  { scaffoldState.snackbarHostState },
@@ -55,11 +92,12 @@ fun ProfileScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel) { navigateUp() }
+                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
                 Row {
-                    TopSettings( navigateTo = { route-> navigateTo(route)})
+                    TopLogOut(navigateTo = { route -> navigateTo(route) }, firebaseAuth = profileViewModel.getFireAuth() )
                     TopNetwork(isNetworkAvailable = profileViewModel.haveNetwork())
                 }
             }
@@ -85,17 +123,22 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text= UiText.StringResource(R.string.auth_profile_welcome,"asd").asString(),
-                    style = MaterialTheme.typography.h5)
-                if(profileViewModel.firstLogin.value) {
-                    //TODO info is not verified and request for verification in mail link ( send it )
-                    //info to usuer and two button -> send verification again and im veryfied now!
-                    Text("USER FIRST LOGIN IT IS and is verified: ${profileViewModel.getFireAuth().currentUser?.isEmailVerified}")
-                }
-                Text("USER: ${profileViewModel.getFireAuth().currentUser?.email}")
-                Text("LOG OUT",modifier= Modifier.clickable(onClick = { profileViewModel.getFireAuth().signOut() }))
+
+                //profile first login Message for User
+                ProfileFirstLoginMessage(
+                    profileFirstLogin = profileViewModel.profileDataState.value.profileFirstLogin,
+                    fbAuth = profileViewModel.getFireAuth() )
+
+                ProfileVerificationMessage(
+                    checkVerification =  profileViewModel::checkVerification,
+                    sendVerificationMail= profileViewModel::resendActivationMail,
+                    fbAuth = profileViewModel.getFireAuth(),
+                    profileIsVerified = profileViewModel.profileDataState.value.profileVerified,
+                    verificationMailButtonEnabled = profileViewModel.verificationMailButtonEnabled,
+                    verificationMailButtonVisible = profileViewModel.verificationMailButtonVisible,
+                    verificationCheckButtonEnabled =profileViewModel.verificationCheckButtonEnabled.value,
+                )
+
             }
         }
     }

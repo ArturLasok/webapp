@@ -1,5 +1,6 @@
-package com.arturlasok.webapp.feature_auth.presentation.components
+package com.arturlasok.feature_core.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,43 +23,26 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AuthButton(
+fun AlertButton(
     buttonText: String,
     textPadding: Dp,
     buttonAction:() ->Unit,
     buttonEnabled: Boolean = true,
     modifier :Modifier) {
+
     OutlinedButton(
         colors = ButtonDefaults.buttonColors(
             disabledBackgroundColor = MaterialTheme.colors.surface,
 
-            backgroundColor = MaterialTheme.colors.surface,
+            backgroundColor = MaterialTheme.colors.background,
 
-        ),
+            ),
+        border = BorderStroke(1.dp,MaterialTheme.colors.primary),
         enabled = buttonEnabled,
         onClick = { buttonAction() },
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        ) {
-
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = buttonText,
-                    modifier = Modifier.padding(start = textPadding, end = textPadding),
-                    style = MaterialTheme.typography.h3,
-                    color = if(buttonEnabled) {Color.White } else { MaterialTheme.colors.surface }
-                )
-                Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(textPadding+textPadding).height(20.dp)) {
-                    if(!buttonEnabled) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 1.dp,
-                            //backgroundColor = Color.DarkGray,
-                            modifier = Modifier.width((20.dp))
-                        )
-                    }
-                }
-
-            }
+    ) {
+        Text(text = buttonText, style = MaterialTheme.typography.h3, modifier = Modifier.padding(textPadding))
     }
 }
