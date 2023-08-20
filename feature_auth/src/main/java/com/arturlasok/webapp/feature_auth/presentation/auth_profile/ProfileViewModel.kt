@@ -9,6 +9,8 @@ import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
+import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
+import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.ProfileDataState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
@@ -26,12 +28,15 @@ class ProfileViewModel @Inject constructor(
     private val isOnline: isOnline,
     private val fireAuth: FirebaseAuth,
     private val dataStoreInteraction: DataStoreInteraction,
+    private val apiInteraction: ApiInteraction,
+    private val roomInteraction: RoomInteraction
     ):ViewModel() {
 
 
     val verificationMailButtonEnabled = mutableStateOf(true)
     val verificationMailButtonVisible = mutableStateOf(true)
     val verificationCheckButtonEnabled = mutableStateOf(true)
+    val serverTime = mutableStateOf("")
 
     private val profileMail = savedStateHandle.getStateFlow("profileMail","")
     private val profileVerified = savedStateHandle.getStateFlow("profileVerified",false)
@@ -64,7 +69,15 @@ class ProfileViewModel @Inject constructor(
 
 
     }
+    fun getServerTime() {
 
+            apiInteraction.getServerTime().onEach {
+
+                serverTime.value = it
+
+            }.launchIn(viewModelScope)
+
+    }
 
     private fun getUserMail() : String {
         return getFireAuth().currentUser?.email ?: "empty"

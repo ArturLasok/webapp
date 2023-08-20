@@ -2,10 +2,7 @@ package com.arturlasok.webapp.feature_auth.presentation.auth_login
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,11 +17,8 @@ import com.arturlasok.webapp.feature_auth.util.fireBaseErrors
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -116,7 +110,6 @@ class LoginViewModel @Inject constructor(
         return isValidEmailString(authLoginDataState.value.authLogin) && authLoginDataState.value.authPassword.length>9
     }
     fun login() {
-
         if(ifFormIsOk()) {
             fireAuth.signInWithEmailAndPassword(
                 authLoginDataState.value.authLogin,

@@ -1,8 +1,10 @@
 package com.arturlasok.webapp.feature_auth.presentation.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -73,11 +75,12 @@ fun UserShortMessage(
             }
             Text(
                 text = messageText,
-                style = MaterialTheme.typography.h3,
+                style = MaterialTheme.typography.h4,
+                fontWeight = FontWeight.Light,
                 modifier = Modifier.padding(12.dp)
             )
 
-            Row() {
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
                 messageButtons()
             }
         }

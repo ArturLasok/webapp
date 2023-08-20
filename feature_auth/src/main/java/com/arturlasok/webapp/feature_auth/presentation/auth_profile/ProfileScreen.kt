@@ -1,5 +1,6 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +36,7 @@ import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfileScreen(
@@ -45,6 +52,11 @@ fun ProfileScreen(
     val scaffoldState = rememberScaffoldState()
 
     val interactionState = profileViewModel.profileInteractionState
+    LaunchedEffect(key1 = true, block = {
+        if(FirebaseAuth.getInstance().currentUser==null) {
+            navigateTo(Screen.StartScreen.route)
+        }
+    })
     LaunchedEffect(key1 = interactionState.value, block = {
         when(interactionState.value) {
             ProfileInteractionState.Idle -> {
@@ -138,6 +150,10 @@ fun ProfileScreen(
                     verificationMailButtonVisible = profileViewModel.verificationMailButtonVisible,
                     verificationCheckButtonEnabled =profileViewModel.verificationCheckButtonEnabled.value,
                 )
+
+                Text(text = "SERVER TIME: "+profileViewModel.serverTime.value, modifier = Modifier.clickable(onClick = {
+                    profileViewModel.getServerTime()
+                }))
 
             }
         }

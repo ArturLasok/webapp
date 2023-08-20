@@ -60,6 +60,10 @@ dependencies {
     implementation(Compose.composeFundation)
     implementation(Compose.composeMaterial)
     implementation(Compose.composeIcons)
+    //Ktor
+    implementation(Ktor.ktorClient)
+    implementation(Ktor.ktorNegotiation)
+    implementation(Ktor.ktorJson)
     //coreKtx
     //implementation(AndroidX.coreKtx)
     //Firebase

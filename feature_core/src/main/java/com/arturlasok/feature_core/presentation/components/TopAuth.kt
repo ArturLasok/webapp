@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.arturlasok.feature_core.R
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.util.UiText
@@ -30,10 +31,21 @@ fun TopAuth(
         },
         modifier = Modifier.padding(0.dp)
     ) {
-        Icon(
-            Icons.Filled.Face, UiText.StringResource(R.string.core_user,"asd").asString(),
-            tint = MaterialTheme.colors.onSurface,
-        )
+        if(fireAuth.currentUser!=null) {
+            UserLogoCircle(
+                letter = fireAuth.currentUser!!.email?.substring(0,1) ?: "@" ,
+                letterSize = 16.sp,
+                color = "#FFEDE7F6",
+                colorsecond = "#FFEDE7F6",
+                size = 24
+            )
+        } else {
+            Icon(
+                Icons.Filled.Face, UiText.StringResource(R.string.core_user,"asd").asString(),
+                tint = MaterialTheme.colors.onSurface,
+            )   
+        }
+       
 
     }
 

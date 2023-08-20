@@ -150,6 +150,7 @@ fun LoginScreen(
                     isPasswordRepeatField = false,
                     setPasswordVisibility = {newVal ->  loginViewModel.setAuthPasswordVisibility(newVal)}
                 )
+                /*
                 Spacer(modifier = Modifier.height(4.dp))
                 AuthCheckBox(
                     modifier = Modifier,
@@ -158,6 +159,8 @@ fun LoginScreen(
                     checkValue = authLoginDataState.authRememberUser,
                     setNewCheckValue = { newVal ->  loginViewModel.setRememberUser(newVal)}
                 )
+
+                 */
                 Spacer(modifier = Modifier.height(8.dp))
                 AuthButton(
                     buttonText = UiText.StringResource(R.string.auth_loginButton,"asd").asString(),
