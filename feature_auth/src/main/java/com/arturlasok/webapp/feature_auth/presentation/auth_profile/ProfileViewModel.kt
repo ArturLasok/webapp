@@ -1,12 +1,14 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
+import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
@@ -31,7 +33,7 @@ class ProfileViewModel @Inject constructor(
     private val apiInteraction: ApiInteraction,
     private val roomInteraction: RoomInteraction
     ):ViewModel() {
-
+   //TODO SEND VER email on registration
 
     val verificationMailButtonEnabled = mutableStateOf(true)
     val verificationMailButtonVisible = mutableStateOf(true)
@@ -49,11 +51,13 @@ class ProfileViewModel @Inject constructor(
             profileMail = profileMail.value,
             profileVerified = profileVerified.value,
             profileFirstLogin = profileFirstLogin.value,
+            profileVerificationInteractionState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle),
+            profileInfoInteractionState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle)
         )
     )
 
-    val profileInteractionState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle)
-
+   // val profileVerificationInteractionState =
+   // val profileInfoInteractionState =
 
     init {
 
@@ -66,9 +70,11 @@ class ProfileViewModel @Inject constructor(
         profileDataState.value = profileDataState.value.copy(profileMail =  getUserMail())
         //set is verified user
         profileDataState.value = profileDataState.value.copy(profileVerified = getIsVerified())
-
+        //get profile info
+        getProfileInfoFormKtor()
 
     }
+
     fun getServerTime() {
 
             apiInteraction.getServerTime().onEach {
@@ -78,14 +84,21 @@ class ProfileViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
     }
-
+    fun darkFromStore() : Flow<Int> {
+        return dataStoreInteraction.getDarkThemeInt()
+    }
     private fun getUserMail() : String {
         return getFireAuth().currentUser?.email ?: "empty"
     }
     fun getIsVerified() : Boolean {
-        return getFireAuth().currentUser?.isEmailVerified ?: false
+        val ver = getFireAuth().currentUser?.isEmailVerified ?: false
+        return ver
     }
+    fun updateUserVerificationInKtor(key:String,mail:String) {
+        apiInteraction.ktor_updateUserVerificationToTrue(key,mail).onEach {
 
+        }.launchIn(viewModelScope)
+    }
 
     fun haveNetwork() : Boolean {
         return isOnline.isNetworkAvailable.value
@@ -105,9 +118,32 @@ class ProfileViewModel @Inject constructor(
             dataStoreInteraction.setFirstLogin(state)
         }
     }
-   fun checkVerification() {
+    private fun getProfileInfoFormKtor() {
 
-        profileInteractionState.value = ProfileInteractionState.Interact(
+        apiInteraction.ktor_getUserData(
+            key = getFireAuth().currentUser?.uid ?: "",
+            mail = getFireAuth().currentUser?.email ?: "").onEach {
+            if(it.webUserMail.isNotEmpty()) {
+                profileDataState.value= profileDataState.value.copy(
+                    profileCountry = it.webSimCountry,
+                    profileLang = it.webUserLang,
+                    profileMail = it.webUserMail)
+                profileDataState.value = profileDataState.value.copy(profileInfoInteractionState = mutableStateOf(ProfileInteractionState.OnComplete))
+            } else {
+                profileDataState.value = profileDataState.value.copy(profileInfoInteractionState = mutableStateOf(ProfileInteractionState.Error(
+                    message = UiText.StringResource(R.string.auth_somethingWrong,"asd").asString(applicationContext),
+                    action = fun() {
+                        profileDataState.value = profileDataState.value.copy(profileInfoInteractionState = mutableStateOf(ProfileInteractionState.Idle))
+                    }
+                )))
+
+            }
+        }.launchIn(viewModelScope)
+
+    }
+   fun checkVerification() {
+       // val profileVerificationInteractionState = profileDataState.value.profileVerificationInteractionState
+       profileDataState.value.profileVerificationInteractionState.value = ProfileInteractionState.Interact(
             action = fun ()
             {
             verificationCheckButtonEnabled.value = false
@@ -115,16 +151,25 @@ class ProfileViewModel @Inject constructor(
         )
 
        getFireAuth().currentUser!!.reload().addOnCompleteListener { task->
-            profileInteractionState.value = ProfileInteractionState.OnComplete
+           profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.OnComplete
             if (task.isSuccessful) {
                 if(getFireAuth().currentUser?.isEmailVerified == true) {
 
-                    profileInteractionState.value = ProfileInteractionState.IsSuccessful(
+                    profileDataState.value.profileVerificationInteractionState.value = ProfileInteractionState.IsSuccessful(
                         message = UiText.StringResource(R.string.auth_verifiednow,"asd").asString(applicationContext),
                         action = fun()
                         {
+                            //update user verification in ktor
+                            getFireAuth().currentUser?.email?.let {
+                                getFireAuth().currentUser?.let { it1 ->
+                                    updateUserVerificationInKtor(
+                                        it1.uid,
+                                        it
+                                    )
+                                }
+                            }
                             profileDataState.value = profileDataState.value.copy(profileVerified = true)
-                            profileInteractionState.value = ProfileInteractionState.Idle
+                            profileDataState.value.profileVerificationInteractionState.value = ProfileInteractionState.Idle
                         }
                     )
 
@@ -132,14 +177,14 @@ class ProfileViewModel @Inject constructor(
 
                 }
                 else {
-                    profileInteractionState.value = ProfileInteractionState.Error(
+                    profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Error(
                         message = UiText.StringResource(R.string.auth_verify_failed,"asd").asString(applicationContext),
                         action = fun()
                         {
                             verificationMailButtonEnabled.value = true
                             verificationCheckButtonEnabled.value = true
                             verificationMailButtonVisible.value = true
-                            profileInteractionState.value = ProfileInteractionState.Idle
+                            profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Idle
                         }
                     )
 
@@ -147,13 +192,13 @@ class ProfileViewModel @Inject constructor(
 
                 }
             } else {
-                profileInteractionState.value = ProfileInteractionState.Error(
+                profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Error(
                     message = UiText.StringResource(R.string.auth_fberror_internal,"asd").asString(applicationContext),
                     action = fun()
                     {
                         verificationMailButtonEnabled.value = true
                         verificationCheckButtonEnabled.value =true
-                        profileInteractionState.value = ProfileInteractionState.Idle
+                        profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Idle
                     }
                 )
 
@@ -163,7 +208,8 @@ class ProfileViewModel @Inject constructor(
 
     }
     fun resendActivationMail() {
-        profileInteractionState.value = ProfileInteractionState.Interact(
+
+        profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Interact(
             action = fun ()
             {
                 verificationMailButtonEnabled.value = false
@@ -171,25 +217,25 @@ class ProfileViewModel @Inject constructor(
         )
 
         getFireAuth().currentUser!!.sendEmailVerification().addOnCompleteListener { task ->
-            profileInteractionState.value = ProfileInteractionState.OnComplete
+            profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.OnComplete
             if (task.isSuccessful) {
-                profileInteractionState.value = ProfileInteractionState.IsSuccessful(
+                profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.IsSuccessful(
                     message = UiText.StringResource(R.string.auth_resend_ver_mail,"asd").asString(applicationContext),
                     action = fun()
                     {
                         verificationMailButtonVisible.value = false
-                        profileInteractionState.value = ProfileInteractionState.Idle
+                        profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Idle
                     }
                 )
 
             } else {
-                profileInteractionState.value = ProfileInteractionState.Error(
+                profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Error(
                     message = UiText.StringResource(R.string.auth_fberror_internal,"asd").asString(applicationContext),
                     action = fun()
                     {
 
                         verificationMailButtonEnabled.value = true
-                        profileInteractionState.value = ProfileInteractionState.Idle
+                        profileDataState.value.profileVerificationInteractionState.value  = ProfileInteractionState.Idle
                     }
                 )
 

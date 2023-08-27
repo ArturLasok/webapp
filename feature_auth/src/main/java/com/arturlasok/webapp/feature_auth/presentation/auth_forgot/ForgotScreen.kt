@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -98,7 +100,7 @@ fun ForgotScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    TopBack(isHome = false,isSecondScreen = false, isInDualMode = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
@@ -132,76 +134,95 @@ fun ForgotScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp))
-                when(authState.value) {
-
-                    AuthState.Success -> {
-                        Text(
-                            text =
-                            UiText.StringResource(R.string.auth_fb_resetMailSended_next, "asd").asString(),
-                            style = MaterialTheme.typography.h4,
-                            textDecoration = TextDecoration.None,
-                            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-                        )
+                Surface(shape = MaterialTheme.shapes.medium, elevation = 20.dp, color = MaterialTheme.colors.background, modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp).padding(top = 0.dp)) {
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(10.dp)
+                                .height(30.dp)
                         )
-                        AuthButton(
-                            buttonText =
-                            UiText.StringResource(R.string.auth_forgotButtonBack, "asd").asString(),
-                            textPadding = 30.dp,
-                            buttonAction = {
-                               navigateTo(Screen.AuthScreen.route)
-                               forgotViewModel.setAuthState(AuthState.Idle)
-                            },
-                            buttonEnabled = true,
-                            modifier = Modifier
-                        )
-                    }
+                        when (authState.value) {
 
-                    else -> {
-                        Text(
-                            text = UiText.StringResource(R.string.auth_forgotForm, "asd").asString()
-                                .uppercase(),
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(10.dp)
-                        )
-                        Text(
-                            text =
-                            UiText.StringResource(R.string.auth_forgotInfo, "asd").asString(),
-                            style = MaterialTheme.typography.h4,
-                            textDecoration = TextDecoration.None,
-                            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(10.dp)
-                        )
+                            AuthState.Success -> {
+                                Text(
+                                    text =
+                                    UiText.StringResource(
+                                        R.string.auth_fb_resetMailSended_next,
+                                        "asd"
+                                    )
+                                        .asString(),
+                                    style = MaterialTheme.typography.h4,
+                                    textDecoration = TextDecoration.None,
+                                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(10.dp)
+                                )
+                                AuthButton(
+                                    buttonText =
+                                    UiText.StringResource(R.string.auth_forgotButtonBack, "asd")
+                                        .asString(),
+                                    textPadding = 30.dp,
+                                    buttonAction = {
+                                        navigateTo(Screen.AuthScreen.route)
+                                        forgotViewModel.setAuthState(AuthState.Idle)
+                                    },
+                                    buttonEnabled = true,
+                                    modifier = Modifier
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
 
-                        EmailTextField(
-                            authLogin = authForgotDataState.authLogin
-                        ) { login -> forgotViewModel.setAuthLogin(login) }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        AuthButton(
-                            buttonText =
-                            UiText.StringResource(R.string.auth_forgotButton, "asd").asString(),
-                            textPadding = 30.dp,
-                            buttonAction = {
-                               forgotViewModel.setAuthState(AuthState.Idle)
-                                forgotViewModel.sendMail()
-                            },
-                            buttonEnabled = forgotViewModel.isForgotButtonEnabled(),
-                            modifier = Modifier
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                            else -> {
+                                Text(
+                                    fontWeight = FontWeight.Bold,
+                                    text = UiText.StringResource(R.string.auth_forgotForm, "asd")
+                                        .asString()
+                                        .uppercase(),
+                                )
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(10.dp)
+                                )
+                                Text(
+                                    text =
+                                    UiText.StringResource(R.string.auth_forgotInfo, "asd")
+                                        .asString(),
+                                    style = MaterialTheme.typography.h4,
+                                    textDecoration = TextDecoration.None,
+                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(10.dp)
+                                )
+
+                                EmailTextField(
+                                    authLogin = authForgotDataState.authLogin
+                                ) { login -> forgotViewModel.setAuthLogin(login) }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                AuthButton(
+                                    buttonText =
+                                    UiText.StringResource(R.string.auth_forgotButton, "asd")
+                                        .asString(),
+                                    textPadding = 30.dp,
+                                    buttonAction = {
+                                        forgotViewModel.setAuthState(AuthState.Idle)
+                                        forgotViewModel.sendMail()
+                                    },
+                                    buttonEnabled = forgotViewModel.isForgotButtonEnabled(),
+                                    modifier = Modifier
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
                     }
                 }
             }

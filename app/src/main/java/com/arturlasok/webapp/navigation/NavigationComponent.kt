@@ -1,29 +1,30 @@
 package com.arturlasok.webapp.navigation
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.navigation.Screen
+import com.arturlasok.feature_core.presentation.components.TopBack
+import com.arturlasok.feature_core.presentation.components.TopLogOut
+import com.arturlasok.feature_core.presentation.components.TopMessages
 import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
+import com.arturlasok.webapp.feature_auth.presentation.auth_messages.MessagesScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_profile.ProfileScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_reg.RegScreen
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun NavigationComponent(
@@ -80,6 +81,8 @@ fun NavigationComponent(
             Column() {
                 navHistory(navHostController = navHostController)
                 SettingsScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
                     navigateTo = { route-> navHostController.navigate(route)},
                     navigateUp = { navHostController.popBackStack()},
                     navScreenLabel = UiText.StringResource(Screen.SettingsScreen.label,"asd").asString(),
@@ -186,10 +189,101 @@ fun NavigationComponent(
             route= Screen.ProfileScreen.route) {
             Column() {
                 navHistory(navHostController = navHostController)
-                ProfileScreen(
-                    navigateTo = { route-> navHostController.navigate(route) },
-                    navigateUp = { navHostController.popBackStack()},
-                    navScreenLabel = UiText.StringResource(Screen.ProfileScreen.label,"asd").asString(),
+
+                //LANDSCAPE ORIENTATION -> Dual Screen
+                if(LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Log.i(TAG, "orient: land")
+                    Row() {
+                        Column(modifier = Modifier.fillMaxWidth(0.5f)) {
+
+                            ProfileScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = false,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(Screen.ProfileScreen.label, "asd").asString(),
+                                        onBack = { navHostController.popBackStack()  })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = { fbAuth ->
+                                    TopLogOut(navigateTo = { route ->  navHostController.navigate(route)}, firebaseAuth = fbAuth)
+                                },
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            MessagesScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = true,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(Screen.MessagesScreen.label, "asd").asString(),
+                                        onBack = { navHostController.popBackStack()  })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+
+                                },
+                                navigateTo = { route-> navHostController.navigate(route)},
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                                )
+                        }
+                    }
+                }
+
+                // PORTRAIT ORIENTATION
+                else {
+                    ProfileScreen(
+                        topBack = {
+                            TopBack(
+                                isHome = false,
+                                isSecondScreen = false,
+                                isInDualMode = false,
+                                routeLabel = UiText.StringResource(
+                                    Screen.ProfileScreen.label,
+                                    "asd"
+                                ).asString(),
+                                onBack = { navHostController.popBackStack() })
+                            { navHostController.navigate(Screen.StartScreen.route) }
+                        },
+                        topEnd = { fbAuth ->
+                            TopMessages(navigateTo = {route -> navHostController.navigate(route = route)  })
+                            TopLogOut(
+                                navigateTo = { route -> navHostController.navigate(route = route) },
+                                firebaseAuth = fbAuth
+                            )
+                        },
+                        navigateTo = { route -> navHostController.navigate(route) },
+                        modifierTopBar = modifierTopBar,
+                        modifierScaffold = modifierScaffold,
+                    )
+                }
+            }
+        }
+        // ForgotScreen
+        composable(
+            route= Screen.MessagesScreen.route) {
+            Column() {
+                navHistory(navHostController = navHostController)
+                MessagesScreen(
+                    topBack = {
+                        TopBack(
+                            isHome = false,
+                            isSecondScreen = false,
+                            isInDualMode = false,
+                            routeLabel = UiText.StringResource(Screen.MessagesScreen.label, "asd").asString(),
+                            onBack = { navHostController.popBackStack()  })
+                        { navHostController.navigate(Screen.StartScreen.route) }
+                    },
+                    topEnd = {
+
+                    },
+                    navigateTo = { route-> navHostController.navigate(route)},
                     modifierTopBar = modifierTopBar,
                     modifierScaffold = modifierScaffold,
                 )
@@ -200,7 +294,4 @@ fun NavigationComponent(
 
         }
     }
-  
-
-
 }

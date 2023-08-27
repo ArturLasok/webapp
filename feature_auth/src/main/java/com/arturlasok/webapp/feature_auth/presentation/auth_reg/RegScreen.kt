@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +59,17 @@ fun RegScreen(
 
 
     LaunchedEffect(key1 = authState.value, block = {
-        if(authState.value== AuthState.Success) {   navigateTo(Screen.ProfileScreen.route)  }
+        if(authState.value == AuthState.DbSync) {
+            regViewModel.dbSyncInsertOrUpdateUser()
+        }
+        if(authState.value== AuthState.DbSyncError) {
+
+            navigateTo(Screen.AuthScreen.route)
+        }
+        if(authState.value== AuthState.Success) {
+
+            navigateTo(Screen.ProfileScreen.route)
+        }
         if(authState.value is AuthState.AuthError) {
             snackMessage(
                 snackType = SnackType.ERROR,
@@ -81,7 +93,7 @@ fun RegScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    TopBack(isHome = false, isSecondScreen = false, isInDualMode = false,routeLabel = navScreenLabel, onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
@@ -113,65 +125,94 @@ fun RegScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp))
+                Surface(shape = MaterialTheme.shapes.medium, elevation = 20.dp, color = MaterialTheme.colors.background, modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp).padding(top = 0.dp)) {
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(30.dp)
+                        )
 
-                Text(
-                    text= UiText.StringResource(R.string.auth_signupForm,"asd").asString().uppercase(),
-                )
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp))
-                EmailTextField(
-                    authLogin = authRegDataState.authLogin
-                ) { login -> regViewModel.setAuthLogin(login) }
-                Spacer(modifier = Modifier.height(8.dp))
-                PasswordTextField(
-                    authPassword = authRegDataState.authPassword,
-                    setAuthPassword = { password -> regViewModel.setAuthPassword(password) },
-                    passwordVisibility = authRegDataState.authPasswordVisibility,
-                    isPasswordTheSame = authRegDataState.authIsPasswordTheSame,
-                    isPasswordRepeatField = false,
-                    setPasswordVisibility = {newVal ->  regViewModel.setAuthPasswordVisibility(newVal)}
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                PasswordTextField(
-                    authPassword = authRegDataState.authPasswordRepeat,
-                    setAuthPassword = { password -> regViewModel.setAuthPasswordRepeat(password) },
-                    passwordVisibility = authRegDataState.authPasswordVisibility,
-                    isPasswordTheSame = authRegDataState.authIsPasswordTheSame,
-                    isPasswordRepeatField = true,
-                    setPasswordVisibility = {newVal ->  regViewModel.setAuthPasswordVisibility(newVal)}
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                if(authRegDataState.authIsPasswordTheSame) {
-                    Text(
-                        text = " ",
-                        style = MaterialTheme.typography.h3
-                    )
-                } else {
-                    Text(
-                        text = UiText.StringResource(R.string.auth_notSamePasswords, "asd").asString(),
-                        style = MaterialTheme.typography.h3,
-                        color = MaterialTheme.colors.error
-                    )
+                        Text(
+                            fontWeight = FontWeight.Bold,
+                            text = UiText.StringResource(R.string.auth_signupForm, "asd").asString()
+                                .uppercase(),
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(10.dp)
+                        )
+                        EmailTextField(
+                            authLogin = authRegDataState.authLogin
+                        ) { login -> regViewModel.setAuthLogin(login) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        PasswordTextField(
+                            authPassword = authRegDataState.authPassword,
+                            setAuthPassword = { password -> regViewModel.setAuthPassword(password) },
+                            passwordVisibility = authRegDataState.authPasswordVisibility,
+                            isPasswordTheSame = authRegDataState.authIsPasswordTheSame,
+                            isPasswordRepeatField = false,
+                            setPasswordVisibility = { newVal ->
+                                regViewModel.setAuthPasswordVisibility(
+                                    newVal
+                                )
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        PasswordTextField(
+                            authPassword = authRegDataState.authPasswordRepeat,
+                            setAuthPassword = { password ->
+                                regViewModel.setAuthPasswordRepeat(
+                                    password
+                                )
+                            },
+                            passwordVisibility = authRegDataState.authPasswordVisibility,
+                            isPasswordTheSame = authRegDataState.authIsPasswordTheSame,
+                            isPasswordRepeatField = true,
+                            setPasswordVisibility = { newVal ->
+                                regViewModel.setAuthPasswordVisibility(
+                                    newVal
+                                )
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        if (authRegDataState.authIsPasswordTheSame) {
+                            Text(
+                                text = " ",
+                                style = MaterialTheme.typography.h3
+                            )
+                        } else {
+                            Text(
+                                text = UiText.StringResource(R.string.auth_notSamePasswords, "asd")
+                                    .asString(),
+                                style = MaterialTheme.typography.h3,
+                                color = MaterialTheme.colors.error
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        AuthButton(
+                            buttonText = UiText.StringResource(R.string.auth_signupButton, "asd")
+                                .asString(),
+                            textPadding = 80.dp,
+                            buttonAction = {
+                                //authState.value = AuthState.Idle
+                                regViewModel.register()
+                            },
+                            buttonEnabled = regViewModel.isRegButtonEnabled(),
+                            modifier = Modifier
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = UiText.StringResource(R.string.auth_policy, "asd").asString(),
+                            style = MaterialTheme.typography.h5
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                AuthButton(
-                    buttonText = UiText.StringResource(R.string.auth_signupButton,"asd").asString(),
-                    textPadding = 80.dp,
-                    buttonAction = {
-                        //authState.value = AuthState.Idle
-                        regViewModel.register()
-                                   },
-                    buttonEnabled = regViewModel.isRegButtonEnabled(),
-                    modifier = Modifier)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text= UiText.StringResource(R.string.auth_policy,"asd").asString(),
-                    style = MaterialTheme.typography.h5)
-
             }
         }
     }

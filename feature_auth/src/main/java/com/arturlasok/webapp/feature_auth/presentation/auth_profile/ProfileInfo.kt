@@ -1,0 +1,102 @@
+package com.arturlasok.webapp.feature_auth.presentation.auth_profile
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.arturlasok.feature_core.presentation.components.UserLogoCircle
+import com.arturlasok.webapp.feature_auth.model.ProfileDataState
+import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
+import com.google.firebase.auth.FirebaseAuth
+
+@Composable
+fun ProfileInfo(
+    darkTheme: Int,
+    fbAuth: FirebaseAuth,
+    profileDataState: ProfileDataState,
+) {
+    val isDark : Boolean = when(darkTheme) {
+        0 -> {
+            isSystemInDarkTheme()
+        }
+        1 -> {
+            false
+        }
+        2-> {
+            true
+        }
+        else -> {
+            false
+        }
+    }
+    AnimatedVisibility(
+        visible = profileDataState.profileInfoInteractionState.value==ProfileInteractionState.OnComplete,
+        exit = fadeOut(
+            animationSpec = tween(delayMillis = 1000)
+        ),
+        enter = fadeIn(
+            animationSpec = tween(delayMillis = 0)
+        )
+    ) {
+    Surface(shape = MaterialTheme.shapes.medium, elevation = 20.dp, color = MaterialTheme.colors.background, modifier = Modifier
+        .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+        .fillMaxWidth()
+        .padding(top = 0.dp)) {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(20.dp))
+            UserLogoCircle(
+                letter = profileDataState.profileMail.first().toString(),
+                letterSize = ((LocalConfiguration.current.screenWidthDp / 3) - (LocalConfiguration.current.screenWidthDp / 7)).sp,
+                color = if (isDark) {
+                    MaterialTheme.colors.primaryVariant
+                } else {
+                    MaterialTheme.colors.onSurface
+                },
+                colorsecond = if (isDark) {
+                    MaterialTheme.colors.primaryVariant
+                } else {
+                    MaterialTheme.colors.onSurface
+                },
+                size = LocalConfiguration.current.screenWidthDp / 3
+            )
+            Spacer(Modifier.height(15.dp))
+            Text(text = profileDataState.profileMail, style = MaterialTheme.typography.h3, fontWeight = FontWeight.Bold)
+            Row {
+                Text(
+                    text = "Country: ${profileDataState.profileCountry}",
+                    style = MaterialTheme.typography.h5
+                )
+                Text(text = "  ")
+                Text(
+                    text = "Language: ${profileDataState.profileLang}",
+                    style = MaterialTheme.typography.h5
+                )
+            }
+            Spacer(Modifier.height(15.dp))
+
+        }
+    }
+    }
+}

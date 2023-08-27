@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 
 @Composable
-fun UserLogoCircle(letter: String, letterSize: TextUnit, color:String, colorsecond: String, size: Int) {
+fun UserLogoCircle(letter: String, letterSize: TextUnit, color:Color, colorsecond: Color, size: Int) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -35,7 +35,7 @@ fun UserLogoCircle(letter: String, letterSize: TextUnit, color:String, colorseco
             .clip(CircleShape)
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(color.toColorInt()),Color(colorsecond.toColorInt()) )
+                    listOf(color,colorsecond )
                 )
             )
     )

@@ -1,5 +1,6 @@
 package com.arturlasok.webapp.di
 
+import com.arturlasok.feature_core.data.datasource.room.MessageDao
 import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
 import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
 import dagger.Module
@@ -15,8 +16,8 @@ object InteractionsModule {
 
     @ViewModelScoped
     @Provides
-    fun provideRoomInteraction() : RoomInteraction {
-        return RoomInteraction()
+    fun provideRoomInteraction(messageDao: MessageDao) : RoomInteraction {
+        return RoomInteraction(messageDao = messageDao)
     }
     @ViewModelScoped
     @Provides

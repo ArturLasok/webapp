@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -29,6 +32,8 @@ import com.arturlasok.feature_core.util.snackMessage
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel(),
+    isSecondScreen: Boolean,
+    isInDualMode: Boolean,
     navigateTo: (route: String) -> Unit,
     navigateUp:()->Unit,
     navScreenLabel: String = "",
@@ -53,7 +58,7 @@ fun SettingsScreen(
             {
                 //Front
                 Row {
-                    TopBack(isHome = false, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    TopBack(isHome = false, isSecondScreen = isSecondScreen,isInDualMode = isInDualMode, routeLabel = navScreenLabel, onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
                 //End
@@ -78,26 +83,40 @@ fun SettingsScreen(
                         top = 1.dp
                     )
             )
-            Column() {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                elevation = 20.dp,
+                color = MaterialTheme.colors.background,
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+                    .padding(top = 0.dp)
+            ) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
-                Text(
-                    color = MaterialTheme.colors.onBackground,
-                    text = "datastore dark theme:" + dataStoreDarkTheme.value
-                )
-                Text(
-                    color = MaterialTheme.colors.onBackground, text = "set other dark",
-                    modifier = Modifier.clickable(onClick = {
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            color = MaterialTheme.colors.onBackground,
+                            text = "datastore dark theme:" + dataStoreDarkTheme.value
+                        )
+                        Text(
+                            color = MaterialTheme.colors.onBackground, text = "set other dark",
+                            modifier = Modifier.clickable(onClick = {
 
-                        settingsViewModel.setDark(if (dataStoreDarkTheme.value > 0) 0 else 2)
-                        snackMessage(
-                            snackType = SnackType.NORMAL,
-                            message = "Theme has change",
-                            actionLabel = "OK",
-                            snackbarController =snackbarController,
-                            scaffoldState =scaffoldState)
+                                settingsViewModel.setDark(if (dataStoreDarkTheme.value > 0) 0 else 2)
+                                snackMessage(
+                                    snackType = SnackType.NORMAL,
+                                    message = "Theme has change",
+                                    actionLabel = "OK",
+                                    snackbarController = snackbarController,
+                                    scaffoldState = scaffoldState
+                                )
 
-                    })
-                )
+                            })
+                        )
+                    }
+                }
             }
 
         }

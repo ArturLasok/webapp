@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -30,11 +31,12 @@ fun AuthButton(
     modifier :Modifier) {
     OutlinedButton(
         colors = ButtonDefaults.buttonColors(
-            disabledBackgroundColor = MaterialTheme.colors.surface,
+            disabledBackgroundColor = MaterialTheme.colors.primary,
 
-            backgroundColor = MaterialTheme.colors.surface,
+            backgroundColor = MaterialTheme.colors.primary,
 
         ),
+        elevation = ButtonDefaults.elevation(defaultElevation = 10.dp),
         enabled = buttonEnabled,
         onClick = { buttonAction() },
         modifier = modifier,
@@ -46,9 +48,11 @@ fun AuthButton(
                     text = buttonText,
                     modifier = Modifier.padding(start = textPadding, end = textPadding),
                     style = MaterialTheme.typography.h3,
-                    color = if(buttonEnabled) {Color.White } else { MaterialTheme.colors.surface }
+                    color = if(buttonEnabled) {Color.White } else { MaterialTheme.colors.primary }
                 )
-                Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(textPadding+textPadding).height(20.dp)) {
+                Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+                    .width(textPadding + textPadding)
+                    .height(20.dp)) {
                     if(!buttonEnabled) {
                         CircularProgressIndicator(
                             color = Color.White,

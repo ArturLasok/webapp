@@ -1,7 +1,5 @@
 package com.arturlasok.feature_core.presentation.components
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -28,7 +26,7 @@ fun DefaultSnackbar(
             Snackbar(
                 backgroundColor = if(data.message.substringBefore(">>>")=="error") { MaterialTheme.colors.error } else
                 {MaterialTheme.colors.primary},
-                modifier = Modifier.padding(start =4.dp,end = 4.dp,top = 4.dp, bottom = 4.dp),
+                modifier = Modifier.padding(start =14.dp,end = 14.dp,top = 4.dp, bottom = 4.dp),
                 content = {
                     Text(
                         text = data.message.substringAfter(">>>"),

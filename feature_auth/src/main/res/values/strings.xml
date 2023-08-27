@@ -4,6 +4,7 @@
     <string name="auth_dontRememberPassword">Forgot Password?</string>
     <string name="auth_ok">OK</string>
     <string name="auth_to">To: </string>
+    <string name="auth_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
     <string name="auth_from">From: </string>
     <string name="auth_register">Don\'t have an account? Sign up</string>
     <string name="auth_registerShort">Sign up</string>

@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.isOnline
+import com.arturlasok.webapp.feature_auth.data.datasource.api.model.WebUser
 import com.arturlasok.webapp.navigation.NavigationComponent
 import com.arturlasok.webapp.ui.theme.WebAppTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -73,14 +74,15 @@ class MainActivity : ComponentActivity() {
         auth.useAppLanguage()
         //padding top when landscape only
         var statusBarPaddingTop = 0
-        var statusBarPaddingLeft = 6
+        var statusBarPaddingLeft = 0
         if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             WindowCompat.setDecorFitsSystemWindows(window, true)
             statusBarPaddingTop = 0
-            statusBarPaddingLeft = 6
+            statusBarPaddingLeft = 0
         }
 
         setContent {
+
             //navController
             val navController = rememberNavController()
             //accompanist for system bars controller
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colors.background)
+                        .background(selectedBackgroundGradient)
 
 
                 ) {
@@ -107,11 +109,12 @@ class MainActivity : ComponentActivity() {
                             .background(MaterialTheme.colors.surface)
                             .fillMaxWidth()
                             .height(60.dp)
-                            .padding(start = statusBarPaddingLeft.dp),
+                            .padding(start = (statusBarPaddingLeft+6).dp, end = (statusBarPaddingLeft+6).dp),
                         modifierScaffold = Modifier.padding(
                             start = statusBarPaddingLeft.dp,
-                            top = statusBarPaddingTop.dp
-                        )
+                            top = statusBarPaddingTop.dp,
+                            end = statusBarPaddingLeft.dp
+                        ).background(selectedBackgroundGradient)
                     )
 
                 }

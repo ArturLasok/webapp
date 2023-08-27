@@ -30,11 +30,11 @@ fun UserShortMessage(
     messageButtons: @Composable ()-> Unit,
 ) {
     val styleBackground = when(messageType) {
-        UserMessageType.NORMAL -> { MaterialTheme.colors.surface }
+        UserMessageType.NORMAL -> { MaterialTheme.colors.background }
         UserMessageType.IMPORTANT -> { Color(0xFFBA1A1A) }
     }
     val styleColor = when(messageType) {
-        UserMessageType.NORMAL -> { MaterialTheme.colors.onSurface }
+        UserMessageType.NORMAL -> { MaterialTheme.colors.onBackground}
         UserMessageType.IMPORTANT -> { MaterialTheme.colors.onError }
     }
     Surface(
@@ -76,7 +76,7 @@ fun UserShortMessage(
             Text(
                 text = messageText,
                 style = MaterialTheme.typography.h4,
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(12.dp)
             )
 

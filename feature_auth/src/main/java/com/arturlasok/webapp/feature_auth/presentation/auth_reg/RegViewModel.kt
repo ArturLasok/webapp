@@ -1,6 +1,8 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_reg
 
 import android.app.Application
+import android.content.Context
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -11,12 +13,18 @@ import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
+import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
+import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.AuthLoginDataState
 import com.arturlasok.webapp.feature_auth.model.AuthState
 import com.arturlasok.webapp.feature_auth.util.fireBaseErrors
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -27,6 +35,8 @@ class RegViewModel @Inject constructor(
     private val isOnline: isOnline,
     private val fireAuth: FirebaseAuth,
     private val dataStoreInteraction: DataStoreInteraction,
+    private val apiInteraction: ApiInteraction,
+    private val roomInteraction: RoomInteraction
 ): ViewModel() {
 
     private val authLogin = savedStateHandle.getStateFlow("authLogin","")
@@ -121,7 +131,42 @@ class RegViewModel @Inject constructor(
     }
     fun setAuthState(newState: AuthState) {
         authState.value = newState
-        //savedStateHandle["authMailSendHandle"] = newState == AuthState.Success
+
+    }
+    fun dbSyncInsertOrUpdateUser() {
+        if (getFireAuth().currentUser != null) {
+            getFireAuth().currentUser?.let { ktorInsertOrUpdateUser(it) }
+        } else {
+            authState.value = AuthState.AuthError(
+                UiText.StringResource(R.string.auth_somethingWrong, "asd")
+                    .asString(applicationContext)
+            )
+            getFireAuth().signOut()
+
+        }
+    }
+    private fun ktorInsertOrUpdateUser(user: FirebaseUser) {
+        try {
+            val sim = application.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val tmr = sim.networkCountryIso
+        apiInteraction.ktor_insertOrUpdateUser(key = user.uid, mail = user.email ?: "null", simCountry = tmr).onEach { response->
+            if(response) {
+                authState.value = AuthState.Success
+            }
+            else {
+                getFireAuth().signOut()
+                authState.value = AuthState.DbSyncError
+            }
+        }.launchIn(viewModelScope)
+        } catch (e: Exception) {
+            authState.value = AuthState.AuthError(
+                UiText.StringResource(
+                    R.string.auth_somethingWrong,
+                    "asd"
+                ).asString(applicationContext)
+            )
+        }
+
     }
     fun register() {
 
@@ -132,7 +177,7 @@ class RegViewModel @Inject constructor(
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     setFirstLoginInDataStore(true)
-                    setAuthState(AuthState.Success)
+                    setAuthState(AuthState.DbSync)
                     setMailFollowInDataStore(authRegDataState.value.authLogin)
                 } else {
                     task.exception?.let {
@@ -142,9 +187,11 @@ class RegViewModel @Inject constructor(
                     }
                 }
             }
+
+
         } else {
             setAuthState(AuthState.AuthError(UiText.StringResource(R.string.auth_form_error,"asd").asString(application.applicationContext)))
-            //setMailFollowInDataStore(authRegDataState.value.authLogin)
+
         }
 
     }

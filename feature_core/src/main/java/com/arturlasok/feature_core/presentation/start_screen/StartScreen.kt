@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -44,7 +45,7 @@ fun StartScreen(
 
                //Front
                 Row{
-                    TopBack(isHome = true, routeLabel = navScreenLabel, onBack = { navigateUp() })
+                    TopBack(isHome = true, isSecondScreen = false,isInDualMode = false,routeLabel = navScreenLabel, onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
 
@@ -63,7 +64,7 @@ fun StartScreen(
         }
     ) { paddingValues ->
         //content
-        Box(modifier = modifierScaffold.padding(paddingValues)) {
+        Box(modifier = modifierScaffold.padding(paddingValues).fillMaxSize()) {
 
            Column() {
 

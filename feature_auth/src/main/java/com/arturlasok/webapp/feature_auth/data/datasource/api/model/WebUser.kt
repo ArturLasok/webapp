@@ -10,5 +10,7 @@ data class WebUser(
     val webUserMail: String = "",
     val webVerified: Boolean = false,
     val webLastLog: String = "",
-    val webReg: String = ""
+    val webReg: String = "",
+    val webSimCountry: String = "",
+    val webUserLang: String = ""
 )

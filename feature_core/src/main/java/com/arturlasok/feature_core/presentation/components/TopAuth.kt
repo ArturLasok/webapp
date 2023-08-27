@@ -35,8 +35,8 @@ fun TopAuth(
             UserLogoCircle(
                 letter = fireAuth.currentUser!!.email?.substring(0,1) ?: "@" ,
                 letterSize = 16.sp,
-                color = "#FFEDE7F6",
-                colorsecond = "#FFEDE7F6",
+                color = MaterialTheme.colors.onSurface,
+                colorsecond = MaterialTheme.colors.onSurface,
                 size = 24
             )
         } else {

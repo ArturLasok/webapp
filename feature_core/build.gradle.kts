@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin(KotlinPlugins.serialization) version Kotlin.version
     //id("com.google.gms.google-services")
@@ -26,6 +27,15 @@ android {
     }
     buildTypes {
         getByName("release") {
+            buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        getByName("debug") {
+            buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -64,6 +74,11 @@ dependencies {
     implementation(Ktor.ktorClient)
     implementation(Ktor.ktorNegotiation)
     implementation(Ktor.ktorJson)
+    //Room
+    implementation(Room.roomRuntime)
+    annotationProcessor(Room.roomAnnotationProcessor)
+    ksp(Room.roomKotlinSymbolProcessing)
+    implementation(Room.roomKtx)
     //coreKtx
     //implementation(AndroidX.coreKtx)
     //Firebase

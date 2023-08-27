@@ -37,6 +37,7 @@ fun AlertButton(
             backgroundColor = MaterialTheme.colors.background,
 
             ),
+        elevation = ButtonDefaults.elevation(defaultElevation = 6.dp),
         border = BorderStroke(1.dp,MaterialTheme.colors.primary),
         enabled = buttonEnabled,
         onClick = { buttonAction() },

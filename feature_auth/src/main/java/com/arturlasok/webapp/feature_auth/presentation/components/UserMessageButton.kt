@@ -60,6 +60,7 @@ fun UserMessageButton(
                 backgroundColor =  styleColor,
 
                 ),
+
             enabled = buttonEnabled,
             onClick = { buttonAction() },
             modifier = modifier,
@@ -71,6 +72,7 @@ fun UserMessageButton(
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.Medium,
                 text= buttonText,
+                maxLines = 1,
                 modifier = Modifier.padding(start = textPadding,end = textPadding),
                 style = MaterialTheme.typography.h4,
                 color = if(buttonEnabled) styleBackground else styleColor
