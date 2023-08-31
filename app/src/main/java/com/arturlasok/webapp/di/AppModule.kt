@@ -39,6 +39,7 @@ object AppModule {
                json(Json {
                    ignoreUnknownKeys = true
                    useAlternativeNames = false
+
                })
            }
        }

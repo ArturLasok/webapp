@@ -65,6 +65,7 @@ dependencies {
     implementation(Ktor.ktorClient)
     implementation(Ktor.ktorNegotiation)
     implementation(Ktor.ktorJson)
+    implementation(Ktor.ktorSerialization)
     //vm lifecycle
    // implementation(AndroidX.lifeCyc)
    // implementation(AndroidX.lifeCycVm)

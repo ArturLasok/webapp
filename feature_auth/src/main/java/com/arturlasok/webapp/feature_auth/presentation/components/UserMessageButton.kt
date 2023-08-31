@@ -53,7 +53,7 @@ fun UserMessageButton(
         enter = fadeIn(
             animationSpec = tween(delayMillis = 1000))) {
         OutlinedButton(
-            elevation = ButtonDefaults.elevation(defaultElevation = 10.dp),
+            elevation = ButtonDefaults.elevation(defaultElevation = 5.dp),
             colors = ButtonDefaults.buttonColors(
                 disabledBackgroundColor = styleColor,
 

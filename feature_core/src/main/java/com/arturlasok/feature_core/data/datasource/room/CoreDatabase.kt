@@ -7,7 +7,7 @@ import com.arturlasok.feature_core.data.datasource.room.model.MessageEntity
 @Database(entities = arrayOf(
 MessageEntity::class
 ),
-    version = 1,
+    version = 2,
     exportSchema =false,
     //autoMigrations = [ AutoMigration(from = 18, to = 19, spec = AppDatabase.MyAutoMig::class)]
 

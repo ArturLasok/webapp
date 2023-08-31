@@ -7,10 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "message_room")
 data class MessageEntity(
 
+    @PrimaryKey
     @ColumnInfo(name = "_id")
-    val _id: String? = null,
+    val _id: String = "",
 
-    @PrimaryKey(autoGenerate = true)
+    //@PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "message_id_room")
     val message_id_room: Long?,
 

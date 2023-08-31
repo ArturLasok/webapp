@@ -74,6 +74,7 @@ dependencies {
     implementation(Ktor.ktorClient)
     implementation(Ktor.ktorNegotiation)
     implementation(Ktor.ktorJson)
+    implementation(Ktor.ktorSerialization)
     //Room
     implementation(Room.roomRuntime)
     annotationProcessor(Room.roomAnnotationProcessor)

@@ -20,9 +20,11 @@ import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.webapp.feature_auth.presentation.auth_addmessage.AddMessageScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_messages.MessagesScreen
+import com.arturlasok.webapp.feature_auth.presentation.auth_onemessage.OneMessagesScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_profile.ProfileScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_reg.RegScreen
 
@@ -228,6 +230,7 @@ fun NavigationComponent(
                                 topEnd = {
 
                                 },
+                                currentRoute = it.destination.route.toString(),
                                 navigateTo = { route-> navHostController.navigate(route)},
                                 modifierTopBar = modifierTopBar,
                                 modifierScaffold = modifierScaffold,
@@ -265,31 +268,266 @@ fun NavigationComponent(
                 }
             }
         }
-        // ForgotScreen
+        // Messages List Screen
         composable(
             route= Screen.MessagesScreen.route) {
             Column() {
                 navHistory(navHostController = navHostController)
-                MessagesScreen(
-                    topBack = {
-                        TopBack(
-                            isHome = false,
-                            isSecondScreen = false,
-                            isInDualMode = false,
-                            routeLabel = UiText.StringResource(Screen.MessagesScreen.label, "asd").asString(),
-                            onBack = { navHostController.popBackStack()  })
-                        { navHostController.navigate(Screen.StartScreen.route) }
-                    },
-                    topEnd = {
+                //LANDSCAPE ORIENTATION -> Dual Screen
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Log.i(TAG, "orient: land")
+                    Row() {
+                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
 
-                    },
-                    navigateTo = { route-> navHostController.navigate(route)},
-                    modifierTopBar = modifierTopBar,
-                    modifierScaffold = modifierScaffold,
-                )
+                            MessagesScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = false,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.MessagesScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+                                },
+                                currentRoute = it.destination.route.toString(),
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            AddMessageScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = true,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.AddMessageScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
 
+                                },
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                    }
+                }
+
+                // PORTRAIT ORIENTATION
+                else {
+                    MessagesScreen(
+                        topBack = {
+                            TopBack(
+                                isHome = false,
+                                isSecondScreen = false,
+                                isInDualMode = false,
+                                routeLabel = UiText.StringResource(
+                                    Screen.MessagesScreen.label,
+                                    "asd"
+                                ).asString(),
+                                onBack = { navHostController.popBackStack() })
+                            { navHostController.navigate(Screen.StartScreen.route) }
+                        },
+                        topEnd = {
+
+                        },
+                        currentRoute = it.destination.route.toString(),
+                        navigateTo = { route -> navHostController.navigate(route) },
+                        modifierTopBar = modifierTopBar,
+                        modifierScaffold = modifierScaffold,
+                    )
+
+                }
             }
 
+
+        }
+        //Add Message Screen
+        composable(
+            route= Screen.AddMessageScreen.route) {
+            Column() {
+                navHistory(navHostController = navHostController)
+                //LANDSCAPE ORIENTATION -> Dual Screen
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Log.i(TAG, "orient: land")
+                    Row() {
+                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
+
+                            MessagesScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = false,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.MessagesScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+                                },
+                                currentRoute = it.destination.route.toString(),
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            AddMessageScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = true,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.AddMessageScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+
+                                },
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                    }
+                }
+
+                // PORTRAIT ORIENTATION
+                else {
+                    AddMessageScreen(
+                        topBack = {
+                            TopBack(
+                                isHome = false,
+                                isSecondScreen = false,
+                                isInDualMode = false,
+                                routeLabel = UiText.StringResource(
+                                    Screen.AddMessageScreen.label,
+                                    "asd"
+                                ).asString(),
+                                onBack = { navHostController.popBackStack() })
+                            { navHostController.navigate(Screen.StartScreen.route) }
+                        },
+                        topEnd = {
+
+                        },
+                        navigateTo = { route -> navHostController.navigate(route) },
+                        modifierTopBar = modifierTopBar,
+                        modifierScaffold = modifierScaffold,
+                    )
+
+                }
+            }
+
+
+        }
+        //One Message Screen
+        composable(
+            route= Screen.OneMessageScreen.route,
+            arguments = listOf(navArgument("mesId") { defaultValue = "-1" })
+        ) {
+
+            Column() {
+                navHistory(navHostController = navHostController)
+                //LANDSCAPE ORIENTATION -> Dual Screen
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Log.i(TAG, "orient: land")
+                    Row() {
+                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
+
+                            MessagesScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = false,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.MessagesScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+                                },
+                                currentRoute = it.destination.route.toString(),
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            OneMessagesScreen(
+                                topBack = {
+                                    TopBack(
+                                        isHome = false,
+                                        isSecondScreen = true,
+                                        isInDualMode = true,
+                                        routeLabel = UiText.StringResource(
+                                            Screen.OneMessageScreen.label,
+                                            "asd"
+                                        ).asString(),
+                                        onBack = { navHostController.popBackStack() })
+                                    { navHostController.navigate(Screen.StartScreen.route) }
+                                },
+                                topEnd = {
+
+                                },
+                                mesId = it.arguments?.getString("mesId","-1") ?: "-1",
+                                dualScreen = true,
+                                navigateTo = { route -> navHostController.navigate(route) },
+                                modifierTopBar = modifierTopBar,
+                                modifierScaffold = modifierScaffold,
+                            )
+                        }
+                    }
+                }
+
+                // PORTRAIT ORIENTATION
+                else {
+                    OneMessagesScreen(
+                        topBack = {
+                            TopBack(
+                                isHome = false,
+                                isSecondScreen = false,
+                                isInDualMode = false,
+                                routeLabel = UiText.StringResource(
+                                    Screen.OneMessageScreen.label,
+                                    "asd"
+                                ).asString(),
+                                onBack = { navHostController.popBackStack() })
+                            { navHostController.navigate(Screen.StartScreen.route) }
+                        },
+                        topEnd = {
+
+                        },
+                        mesId = it.arguments?.getString("mesId","-1") ?: "-1",
+                        dualScreen = false,
+                        navigateTo = { route -> navHostController.navigate(route) },
+                        modifierTopBar = modifierTopBar,
+                        modifierScaffold = modifierScaffold,
+                    )
+
+                }
+            }
 
 
         }

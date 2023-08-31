@@ -12,6 +12,11 @@
     <string name="auth_loginForm">Log In Form</string>
     <string name="auth_validEmailLike">A valid email like: address@example.com</string>
     <string name="auth_yourEmail">Your email</string>
+    <string name="auth_hideKeybord">Hide keyboard</string>
+    <string name="auth_send">Send</string>
+    <string name="auth_notopic">Add a message title</string>
+    <string name="auth_nomessageContent">Add message content</string>
+    <string name="auth_messageSent">Message sent</string>
     <string name="auth_clear">Clear</string>
     <string name="auth_verify">Check verification</string>
     <string name="auth_verify_failed">Your account is still not verified. Click on the link received in the e-mail during registration or send the link again.</string>
@@ -41,6 +46,9 @@
     <string name="auth_resend_ver_mail">A verification link has been sent to your email address. Follow the instructions.</string>
     <string name="auth_fberror_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
     <string name="auth_fberror_disabled">The user account has been disabled by an administrator</string>
+    <string name="auth_sendto">Send to:</string>
+    <string name="auth_message_content">Message:</string>
+    <string name="auth_message_topic">Title:</string>
     <string name="auth_fberror_invalidpass">The password is incorrect. If you have forgotten your password, click \"Forgot Password?\"</string>
     <string name="auth_fberror_blocked">Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.</string>
     <string name="auth_afterreg_notregistered">Please confirm your registration by clicking on the link received in the e-mail. Confirmation of registration is necessary to take full advantage of the functionality of the application. Make sure that the messages do not end up in the spam folder in your inbox.</string>

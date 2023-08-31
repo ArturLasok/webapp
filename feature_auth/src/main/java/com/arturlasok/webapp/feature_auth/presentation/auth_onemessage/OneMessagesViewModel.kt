@@ -1,4 +1,4 @@
-package com.arturlasok.webapp.feature_auth.presentation.auth_messages
+package com.arturlasok.webapp.feature_auth.presentation.auth_onemessage
 
 import android.app.Application
 import android.util.Log
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class MessagesViewModel @Inject constructor(
+class OneMessagesViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val application: Application,
     private val isOnline: isOnline,
@@ -31,15 +31,15 @@ class MessagesViewModel @Inject constructor(
     private val roomInteraction: RoomInteraction
     ):ViewModel() {
 
-
+    val oneMessage = mutableStateOf(Message())
     val messageList = mutableStateOf<List<Message>>(listOf())
     val applicationContext = application
 
 
     init {
 
-        Log.i(TAG, "init newses")
-        //getAllMessagesFromKtor()
+        Log.i(TAG, "init one message")
+
 
 
     }
@@ -72,47 +72,18 @@ class MessagesViewModel @Inject constructor(
     private fun getMailFollowFromDataStore() : Flow<String> {
         return dataStoreInteraction.getMailFollow()
     }
-    fun getAllMessagesFromKtor() {
 
-
-        roomInteraction.getAllMessagesIdsFromRoom().onEach { idList->
-
-
-
-
-
-
-        apiInteraction.ktor_getAllMessagesFromUser(getFireAuth().currentUser?.uid ?: "unknown",getUserMail(),idList).onEach { apiMessageList->
-        val readyList : MutableList<WebMessage> = mutableListOf()
-            apiMessageList.onEach {
-              readyList.add(it.copy(_id = it._id.toString().substringAfter("oid=").substringBefore("}"),
-                  //add sync -1 if is new message for this user
-                  wMessage_sync = if(it.wMessage_viewedbyuser>0) 0 else -1))
-             }
-        //to rooom
-            roomInteraction.insertAllMessageToRoom(apiInteraction.messageListFromApiToDomain(readyList)).onEach {
-                Log.i(TAG, "Room insert all messages response $it")
-
-            }.launchIn(viewModelScope).join()
-            getAllMessagesFromRoom()
-
-        }.launchIn(viewModelScope)
-
-        }.launchIn(viewModelScope)
-
-    }
     //fun getAllMessagesFromRoom() : Flow<List<MessageEntity>> = roomInteraction.getAllMessagesFromRoom()
 
     fun getAllMessagesFromRoom() {
         roomInteraction.getAllMessagesFromRoom().onEach {
-            Log.i(TAG, "Room get message, now size: ${it.size}")
+            Log.i(TAG, "Room message size: ${it.size}")
             messageList.value = it
         }.launchIn(viewModelScope)
     }
-    fun removeAllMessagesFromRoom() {
-        roomInteraction.deleteAllMessagesFromRoom().onEach {
-            Log.i(TAG, "Room all message delete $it")
-            if(it) { getAllMessagesFromRoom() }
+    fun getOneMessageFromRoom(messageId:String) {
+        roomInteraction.getOneMessagesFromRoom(messageId).onEach { one->
+            oneMessage.value = one
         }.launchIn(viewModelScope)
     }
 

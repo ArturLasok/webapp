@@ -1,5 +1,6 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -34,69 +37,173 @@ fun ProfileInfo(
     fbAuth: FirebaseAuth,
     profileDataState: ProfileDataState,
 ) {
-    val isDark : Boolean = when(darkTheme) {
+    val isDark: Boolean = when (darkTheme) {
         0 -> {
             isSystemInDarkTheme()
         }
+
         1 -> {
             false
         }
-        2-> {
+
+        2 -> {
             true
         }
+
         else -> {
             false
         }
     }
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        elevation = 20.dp,
+        color = MaterialTheme.colors.background,
+        modifier = Modifier
+            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+            .fillMaxWidth()
+            .padding(top = 0.dp)
+    ) {
+        AnimatedVisibility(
+            visible = profileDataState.profileInfoInteractionState.value == ProfileInteractionState.OnComplete,
+            exit = fadeOut(
+                animationSpec = tween(delayMillis = 1000)
+            ),
+            enter = fadeIn(
+                animationSpec = tween(delayMillis = 0)
+            )
+        ) {
+
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(
+                        Modifier
+                            .height(20.dp)
+                            .fillMaxWidth()
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Spacer(
+                            Modifier.width(20.dp)
+                        )
+                        UserLogoCircle(
+                            letter = profileDataState.profileMail.first().toString(),
+                            letterSize = ((LocalConfiguration.current.screenWidthDp / 5) - (LocalConfiguration.current.screenWidthDp / 7)).sp,
+                            color = if (isDark) {
+                                MaterialTheme.colors.primaryVariant
+                            } else {
+                                MaterialTheme.colors.onSurface
+                            },
+                            colorsecond = if (isDark) {
+                                MaterialTheme.colors.primaryVariant
+                            } else {
+                                MaterialTheme.colors.onSurface
+                            },
+                            size = LocalConfiguration.current.screenWidthDp / 9
+                        )
+                        Spacer(
+                            Modifier
+                                .height(15.dp)
+                                .width(15.dp)
+                        )
+
+                        Column {
+                            Text(
+                                text = profileDataState.profileMail,
+                                style = MaterialTheme.typography.h3,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "\nCountry: ${profileDataState.profileCountry}",
+                                style = MaterialTheme.typography.h5
+                            )
+                            Text(
+                                text = "Language: ${profileDataState.profileLang}",
+                                style = MaterialTheme.typography.h5
+                            )
+                        }
+
+
+                    }
+                    Spacer(
+                        Modifier
+                            .height(15.dp)
+                            .fillMaxWidth()
+                    )
+                }
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(20.dp))
+
+                    UserLogoCircle(
+                        letter = profileDataState.profileMail.first().toString(),
+                        letterSize = ((LocalConfiguration.current.screenWidthDp / 3) - (LocalConfiguration.current.screenWidthDp / 7)).sp,
+                        color = if (isDark) {
+                            MaterialTheme.colors.primaryVariant
+                        } else {
+                            MaterialTheme.colors.onSurface
+                        },
+                        colorsecond = if (isDark) {
+                            MaterialTheme.colors.primaryVariant
+                        } else {
+                            MaterialTheme.colors.onSurface
+                        },
+                        size = LocalConfiguration.current.screenWidthDp / 3
+                    )
+                    Spacer(Modifier.height(15.dp))
+                    Text(
+                        text = profileDataState.profileMail,
+                        style = MaterialTheme.typography.h3,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row {
+                        Text(
+                            text = "Country: ${profileDataState.profileCountry}",
+                            style = MaterialTheme.typography.h5
+                        )
+                        Text(text = "  ")
+                        Text(
+                            text = "Language: ${profileDataState.profileLang}",
+                            style = MaterialTheme.typography.h5
+                        )
+                    }
+
+
+                    Spacer(Modifier.height(15.dp))
+
+                }
+            }
+        }
+
+
     AnimatedVisibility(
-        visible = profileDataState.profileInfoInteractionState.value==ProfileInteractionState.OnComplete,
-        exit = fadeOut(
-            animationSpec = tween(delayMillis = 1000)
-        ),
+        visible = profileDataState.profileInfoInteractionState.value == ProfileInteractionState.Idle,
+
         enter = fadeIn(
-            animationSpec = tween(delayMillis = 0)
+            animationSpec = tween(delayMillis = 500)
         )
     ) {
-    Surface(shape = MaterialTheme.shapes.medium, elevation = 20.dp, color = MaterialTheme.colors.background, modifier = Modifier
-        .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
-        .fillMaxWidth()
-        .padding(top = 0.dp)) {
+
+
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(20.dp))
-            UserLogoCircle(
-                letter = profileDataState.profileMail.first().toString(),
-                letterSize = ((LocalConfiguration.current.screenWidthDp / 3) - (LocalConfiguration.current.screenWidthDp / 7)).sp,
-                color = if (isDark) {
-                    MaterialTheme.colors.primaryVariant
-                } else {
-                    MaterialTheme.colors.onSurface
-                },
-                colorsecond = if (isDark) {
-                    MaterialTheme.colors.primaryVariant
-                } else {
-                    MaterialTheme.colors.onSurface
-                },
-                size = LocalConfiguration.current.screenWidthDp / 3
+            CircularProgressIndicator(
+                color = MaterialTheme.colors.primary,
+                strokeWidth = 1.dp,
+                //backgroundColor = Color.DarkGray,
+                modifier = Modifier.width((40.dp))
             )
-            Spacer(Modifier.height(15.dp))
-            Text(text = profileDataState.profileMail, style = MaterialTheme.typography.h3, fontWeight = FontWeight.Bold)
-            Row {
-                Text(
-                    text = "Country: ${profileDataState.profileCountry}",
-                    style = MaterialTheme.typography.h5
-                )
-                Text(text = "  ")
-                Text(
-                    text = "Language: ${profileDataState.profileLang}",
-                    style = MaterialTheme.typography.h5
-                )
-            }
-            Spacer(Modifier.height(15.dp))
-
+            Spacer(Modifier.height(20.dp))
         }
     }
+
     }
 }
