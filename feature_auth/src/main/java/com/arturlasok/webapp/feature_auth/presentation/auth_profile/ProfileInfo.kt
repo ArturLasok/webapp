@@ -2,6 +2,7 @@ package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,6 +20,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -30,6 +34,7 @@ import com.arturlasok.feature_core.presentation.components.UserLogoCircle
 import com.arturlasok.webapp.feature_auth.model.ProfileDataState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 
 @Composable
 fun ProfileInfo(
@@ -63,13 +68,18 @@ fun ProfileInfo(
             .fillMaxWidth()
             .padding(top = 0.dp)
     ) {
+        val anim = remember { mutableStateOf(0) }
+        LaunchedEffect(key1 = true){
+            delay(100)
+            anim.value = 1
+        }
         AnimatedVisibility(
-            visible = profileDataState.profileInfoInteractionState.value == ProfileInteractionState.OnComplete,
+            visible = profileDataState.profileInfoInteractionState.value == ProfileInteractionState.OnComplete && anim.value==1,
             exit = fadeOut(
                 animationSpec = tween(delayMillis = 1000)
             ),
             enter = fadeIn(
-                animationSpec = tween(delayMillis = 0)
+                animationSpec = tween(delayMillis = 0,easing = FastOutSlowInEasing, durationMillis = 1000)
             )
         ) {
 

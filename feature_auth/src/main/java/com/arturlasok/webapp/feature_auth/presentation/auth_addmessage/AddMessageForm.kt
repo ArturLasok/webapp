@@ -2,6 +2,7 @@ package com.arturlasok.webapp.feature_auth.presentation.auth_addmessage
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -61,33 +61,37 @@ fun AddMessageForm(
     sendClick:() -> Unit,
     darkTheme: Int,
     fbAuth: FirebaseAuth,
-    newMessageDataState: MutableState<NewMessageDataState>
+    newMessageDataState: NewMessageDataState
 ) {
+
     val isDark: Boolean = getDarkBoolean(isSystemInDark = isSystemInDarkTheme(), darkTheme)
-    val textField = remember { mutableStateOf(TextFieldValue(text = newMessageDataState.value.newMessage)) }
-    val topicField = remember { mutableStateOf(TextFieldValue(text = newMessageDataState.value.newMessageTopic)) }
-    val toField = remember { mutableStateOf(TextFieldValue(text = "To: Admin")) }
+    val textField = remember { mutableStateOf(TextFieldValue(text = newMessageDataState.newMessage)) }
+    val topicField = remember { mutableStateOf(TextFieldValue(text = newMessageDataState.newMessageTopic)) }
+    val toField = remember { mutableStateOf(TextFieldValue(text = newMessageDataState.newMessageTo)) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(key1 = newMessageDataState.value, block = {
-
-        if(newMessageDataState.value.newMessage=="" && newMessageDataState.value.newMessageTopic=="") {
+    LaunchedEffect(key1 = newMessageDataState, block = {
+        if(newMessageDataState.newMessageContext.isNotEmpty()) {
+            topicField.value = TextFieldValue(text = newMessageDataState.newMessageTopic)
+            toField.value = TextFieldValue(text = newMessageDataState.newMessageTo)
+        }
+        if(newMessageDataState.newMessageSendInteractionState.value == ProfileInteractionState.OnComplete) {
             Log.i(TAG, "-> CLEAR <---------------------")
             topicField.value = TextFieldValue(text = "")
             textField.value = TextFieldValue(text = "")
+            toField.value = TextFieldValue(text = "")
         }
     } )
     AnimatedVisibility(
-        visible = true,
+        visible = newMessageDataState.newMessageSendInteractionState.value == ProfileInteractionState.OnComplete,
         exit = fadeOut(
-            animationSpec = tween(delayMillis = 1000)
+            animationSpec = tween(delayMillis = 0,easing = FastOutSlowInEasing, durationMillis = 1000)
         ),
         enter = fadeIn(
-            animationSpec = tween(delayMillis = 0)
+            animationSpec = tween(delayMillis = 0,easing = FastOutSlowInEasing, durationMillis = 1000)
         )
     ) {
-
         Surface(
             shape = MaterialTheme.shapes.medium,
             elevation = 20.dp,
@@ -101,8 +105,48 @@ fun AddMessageForm(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                        .fillMaxWidth()
+                )
+                Text(UiText.StringResource(R.string.auth_messageSent, "asd")
+                    .asString(),style = MaterialTheme.typography.h3)
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+
+    AnimatedVisibility(
+        visible = newMessageDataState.newMessageSendInteractionState.value != ProfileInteractionState.OnComplete,
+        exit = fadeOut(
+            animationSpec = tween(delayMillis = 0,easing = FastOutSlowInEasing, durationMillis = 1000)
+        ),
+        enter = fadeIn(
+            animationSpec = tween(delayMillis = 0,easing = FastOutSlowInEasing, durationMillis = 1000)
+        )
+    ) {
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            elevation = 20.dp,
+            color = MaterialTheme.colors.background,
+            modifier = Modifier
+                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+                .fillMaxWidth()
+                .padding(top = 0.dp)
+        ) {
+
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Spacer(modifier = Modifier
-                    .height(20.dp)
+                    .height(15.dp)
                     .fillMaxWidth())
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -136,16 +180,14 @@ fun AddMessageForm(
                             keyboardType = KeyboardType.Ascii,
                             imeAction = ImeAction.Default
                         ),
-                        trailingIcon = {
 
-                        }
 
                     )
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 24.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
                         UserMessageButton(
-                            buttonEnabled = newMessageDataState.value.newMessageSendInteractionState.value == ProfileInteractionState.Idle,
+                            buttonEnabled = newMessageDataState.newMessageSendInteractionState.value == ProfileInteractionState.Idle,
                             buttonVisible = true,
                             messageType = UserMessageType.NORMAL,
                             buttonText = UiText.StringResource(R.string.auth_send,"asd").asString(),
@@ -157,11 +199,11 @@ fun AddMessageForm(
 
                 }
                 Spacer(modifier = Modifier
-                    .height(15.dp)
+                    .height(10.dp)
                     .fillMaxWidth())
                 //Topic field
                 OutlinedTextField(
-                    enabled = true,
+                    enabled = newMessageDataState.newMessageContext.isEmpty(),
                     modifier = Modifier
                         .padding(start = 24.dp, end = 24.dp)
                         .fillMaxWidth(),
@@ -194,16 +236,20 @@ fun AddMessageForm(
                     }),
                     trailingIcon = {
                         Row {
-                            IconButton(onClick = {
-                                topicField.value = TextFieldValue(text = "")
-                                //isValidEmail.value = false
-                                setNewMessageTopic("")
-                            }) {
-                                Icon(
-                                    Icons.Filled.Clear, UiText.StringResource(R.string.auth_clear,"asd").asString(),
-                                    tint = Color.Red
-                                )
+                            if(newMessageDataState.newMessageContext.isEmpty()) {
+                                IconButton(onClick = {
+                                    topicField.value = TextFieldValue(text = "")
+                                    //isValidEmail.value = false
+                                    setNewMessageTopic("")
+                                }) {
+                                    Icon(
+                                        Icons.Filled.Clear,
+                                        UiText.StringResource(R.string.auth_clear, "asd")
+                                            .asString(),
+                                        tint = Color.Red
+                                    )
 
+                                }
                             }
                             IconButton(onClick = {
                                 keyboardController?.hide(); focusManager.clearFocus(true)
@@ -219,7 +265,7 @@ fun AddMessageForm(
 
                 )
                 Spacer(modifier = Modifier
-                    .height(15.dp)
+                    .height(10.dp)
                     .fillMaxWidth())
                 OutlinedTextField(
                     modifier = Modifier
@@ -286,7 +332,7 @@ fun AddMessageForm(
 
                 )
                 Spacer(modifier = Modifier
-                    .height(20.dp)
+                    .height(15.dp)
                     .fillMaxWidth())
             }
         }

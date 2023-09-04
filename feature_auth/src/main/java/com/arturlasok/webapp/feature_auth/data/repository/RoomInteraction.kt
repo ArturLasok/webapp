@@ -1,14 +1,12 @@
 package com.arturlasok.webapp.feature_auth.data.repository
 
 import android.util.Log
-import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.data.datasource.room.MessageDao
 import com.arturlasok.feature_core.data.datasource.room.model.MessageEntity
 import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.lang.Exception
 
 class RoomInteraction(val messageDao: MessageDao) {
 
@@ -112,9 +110,9 @@ class RoomInteraction(val messageDao: MessageDao) {
             emit(false)
         }
     }
-    fun deleteMessageFromRoom(message: Message) : Flow<Boolean> = flow {
+    fun deleteMessageFromRoom(messageId: String) : Flow<Boolean> = flow {
         try {
-            val delete = messageDao.deleteMessageFromRoomById(message.dMessage_id ?: -1)
+            val delete = messageDao.deleteMessageFromRoomById(messageId)
             if(delete>0) { emit(true) } else { emit(false) }
         }
         catch (e:Exception) {

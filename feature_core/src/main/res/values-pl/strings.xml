@@ -5,6 +5,7 @@
     <string name="core_networkNotAvailable">No internet connection</string>
     <string name="core_networkAvailable">Network available</string>
     <string name="core_settings">Settings</string>
+    <string name="core_deleteIcon">Delete</string>
     <string name="Screen_Start">Home</string>
     <string name="Screen_Settings">Ustawienia</string>
     <string name="Screen_Auth">Logowanie</string>

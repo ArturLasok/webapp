@@ -118,6 +118,11 @@ class ProfileViewModel @Inject constructor(
             dataStoreInteraction.setFirstLogin(state)
         }
     }
+    fun removeAllMessagesFromRoom() {
+        roomInteraction.deleteAllMessagesFromRoom().onEach {
+            Log.i(TAG, "Room all message delete $it")
+        }.launchIn(viewModelScope)
+    }
     private fun getProfileInfoFormKtor() {
 
         apiInteraction.ktor_getUserData(

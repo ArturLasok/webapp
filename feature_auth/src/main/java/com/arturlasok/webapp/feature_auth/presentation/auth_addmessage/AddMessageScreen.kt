@@ -1,5 +1,6 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_addmessage
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +26,7 @@ import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
 import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
+import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
@@ -34,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun AddMessageScreen(
     messagesViewModel: MessagesViewModel = hiltViewModel(),
     addMessageViewModel: AddMessageViewModel = hiltViewModel(),
+    contextId: String,
     topBack: @Composable () -> Unit,
     topEnd: @Composable () -> Unit,
     navigateTo: (route: String) -> Unit,
@@ -44,11 +48,17 @@ fun AddMessageScreen(
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val scaffoldState = rememberScaffoldState()
     val dataStoreDarkTheme = addMessageViewModel.darkFromStore().collectAsState(initial = 0)
-
+    LaunchedEffect(key1 = true, block = {
+        //load data if message have context
+        if(contextId.isNotEmpty()) {
+            addMessageViewModel.getOneMessageFromRoom(contextId)
+        }
+    })
     LaunchedEffect(key1 = true, block = {
         if(FirebaseAuth.getInstance().currentUser==null) {
             navigateTo(Screen.StartScreen.route)
         }
+
     })
     LaunchedEffect(key1 = addMessageViewModel.newMessageDataState.value.newMessageSendInteractionState.value, block = {
         when(addMessageViewModel.newMessageDataState.value.newMessageSendInteractionState.value) {
@@ -132,13 +142,14 @@ fun AddMessageScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text("arg:$contextId")
                 AddMessageForm(
                     setNewMessage = { message -> addMessageViewModel.setNewMessageText(message) },
                     setNewMessageTopic = { messageTopic -> addMessageViewModel.setNewMessageTopic(messageTopic)  },
                     setNewMessageContext = { mContext ->  addMessageViewModel.setNewMessageContext(mContext) },
                     darkTheme = dataStoreDarkTheme.value,
                     fbAuth = addMessageViewModel.getFireAuth(),
-                    newMessageDataState = addMessageViewModel.newMessageDataState,
+                    newMessageDataState = addMessageViewModel.newMessageDataState.value,
                     sendClick = { addMessageViewModel.sendMessage() }
                 )
 

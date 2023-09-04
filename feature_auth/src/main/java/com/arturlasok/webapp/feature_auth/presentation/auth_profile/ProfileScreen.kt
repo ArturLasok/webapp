@@ -24,12 +24,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
+import com.arturlasok.feature_core.presentation.components.TopLogOut
 import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
+import com.google.android.play.core.integrity.p
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -129,6 +131,16 @@ fun ProfileScreen(
                 //End
                 Row {
                     topEnd(profileViewModel.getFireAuth())
+                    TopLogOut({route ->
+
+                        //clear DB
+                        profileViewModel.removeAllMessagesFromRoom()
+                        //navigate to login
+                        navigateTo(route)
+
+
+                              }, firebaseAuth = profileViewModel.getFireAuth())
+
                     //TopLogOut(navigateTo = { route -> navigateTo(route) }, firebaseAuth = profileViewModel.getFireAuth() )
                     //TopNetwork(isNetworkAvailable = profileViewModel.haveNetwork())
                 }

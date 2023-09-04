@@ -15,8 +15,8 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllMessageToRoom(messageListEntity: List<MessageEntity>) : List<Long>
 
-    @Query("DELETE FROM MESSAGE_ROOM WHERE message_id_room=:messageIdRoom")
-    suspend fun deleteMessageFromRoomById(messageIdRoom: Long) : Int
+    @Query("DELETE FROM MESSAGE_ROOM WHERE _id=:messageIdRoom")
+    suspend fun deleteMessageFromRoomById(messageIdRoom: String) : Int
     @Query("DELETE FROM MESSAGE_ROOM")
     suspend fun deleteAllMessagesFromRoom() : Int
     @Query("SELECT * FROM MESSAGE_ROOM ORDER BY message_added_room DESC")

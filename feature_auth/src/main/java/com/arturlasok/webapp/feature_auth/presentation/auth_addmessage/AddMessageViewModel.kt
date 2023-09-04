@@ -37,6 +37,7 @@ class AddMessageViewModel @Inject constructor(
     private val newMessage= savedStateHandle.getStateFlow("newMessage","")
     private val newMessageTopic = savedStateHandle.getStateFlow("newMessageTopic","")
     private val newMessageContext = savedStateHandle.getStateFlow("newMessageContext","")
+    private val newMessageTo = savedStateHandle.getStateFlow("newMessageTo","artpl81@gmail.com")
 
     val applicationContext = application
 
@@ -45,6 +46,7 @@ class AddMessageViewModel @Inject constructor(
             newMessage = newMessage.value,
             newMessageTopic = newMessageTopic.value,
             newMessageContext = newMessageContext.value,
+            newMessageTo = newMessageTo.value,
             newMessageSendInteractionState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle)
         )
     )
@@ -95,7 +97,31 @@ class AddMessageViewModel @Inject constructor(
         savedStateHandle["newMessageContext"] = messageContext
         newMessageDataState.value = newMessageDataState.value.copy(newMessageContext = messageContext)
     }
+    fun setNewMessageTo(messageTo:String) {
+        savedStateHandle["newMessageTo"] = messageTo
+        newMessageDataState.value = newMessageDataState.value.copy(newMessageTo = messageTo)
+    }
+    fun getOneMessageFromRoom(messageId:String) {
+
+        roomInteraction.getOneMessagesFromRoom(messageId).onEach { one->
+            Log.i(TAG, "Add mess re: ${one.dMessage_title}")
+            setNewMessageTo(one.dMessage_author_mail)
+
+            setNewMessageTopic((if(one.dMessage_title.contains("Re: ")) { "" } else "Re: ")+one.dMessage_title)
+
+            setNewMessageContext(one._did.toString())
+           // setNewMessageText(one.dMessage_content)
+            newMessageDataState.value = newMessageDataState.value.copy(
+                newMessageTo = newMessageTo.value,
+                newMessageContext = newMessageContext.value,
+                newMessageTopic = newMessageTopic.value,
+                newMessage = newMessage.value,
+                newMessageSendInteractionState = mutableStateOf(ProfileInteractionState.Idle)
+            )
+        }.launchIn(viewModelScope)
+    }
     private fun sendMessageToKtor(action:(ret: Boolean)->Unit) {
+        //action(true)
 
         try {
             getFireAuth().currentUser?.let { fuser ->
@@ -108,13 +134,13 @@ class AddMessageViewModel @Inject constructor(
                         WebMessage(
                             _id = null,
                             wMessage_id = 0L,
-                            wMessage_title = newMessageDataState.value.newMessageTopic,
+                            wMessage_title = newMessageDataState.value.newMessageTopic.replaceFirstChar { it.uppercase() },
                             wMessage_content = newMessageDataState.value.newMessage,
                             wMessage_author_mail = fuser.email ?: "unknown",
-                            wMessage_context = "",
+                            wMessage_context = newMessageDataState.value.newMessageContext,
                             wMessage_added = System.currentTimeMillis(),
                             wMessage_edited = 0L,
-                            wMessage_user_mail = fuser.email ?: "unknown",
+                            wMessage_user_mail = newMessageDataState.value.newMessageTo,
                             wMessage_user_lang = lang,
                             wMessage_user_country = country,
                             wMessage_viewedbyuser = 0L,
@@ -131,6 +157,8 @@ class AddMessageViewModel @Inject constructor(
         }
         catch (e:Exception) { action(false) }
 
+
+
     }
     fun sendMessage() {
 
@@ -143,16 +171,19 @@ class AddMessageViewModel @Inject constructor(
         if(newMessageDataState.value.newMessageTopic.isNotEmpty() && newMessageDataState.value.newMessage.isNotEmpty() && getFireAuth().currentUser?.isEmailVerified == true) {
 
             //ok to send
-            sendMessageToKtor(action = {result->
+            sendMessageToKtor(
+                action = {result->
                 if(result) {
+
                     newMessageDataState.value.newMessageSendInteractionState.value =
                         ProfileInteractionState.IsSuccessful(
                             message = UiText.StringResource(R.string.auth_messageSent, "asd")
                                 .asString(applicationContext),
                             action = fun() {
-                                newMessageDataState.value = newMessageDataState.value.copy(newMessage="",newMessageTopic="",newMessageContext="")
+                               // newMessageDataState.value.newMessageSendInteractionState.value = ProfileInteractionState.OnComplete
+                                newMessageDataState.value = newMessageDataState.value.copy(newMessage="",newMessageTopic="",newMessageContext="",newMessageTo="")
                                 newMessageDataState.value.newMessageSendInteractionState.value =
-                                    ProfileInteractionState.Idle
+                                    ProfileInteractionState.OnComplete
                             }
                         )
                 } else {

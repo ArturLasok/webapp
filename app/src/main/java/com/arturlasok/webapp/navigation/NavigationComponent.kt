@@ -209,7 +209,7 @@ fun NavigationComponent(
                                     { navHostController.navigate(Screen.StartScreen.route) }
                                 },
                                 topEnd = { fbAuth ->
-                                    TopLogOut(navigateTo = { route ->  navHostController.navigate(route)}, firebaseAuth = fbAuth)
+                                    //TopLogOut(navigateTo = { route ->  navHostController.navigate(route)}, firebaseAuth = fbAuth)
                                 },
                                 navigateTo = { route -> navHostController.navigate(route) },
                                 modifierTopBar = modifierTopBar,
@@ -256,10 +256,7 @@ fun NavigationComponent(
                         },
                         topEnd = { fbAuth ->
                             TopMessages(navigateTo = {route -> navHostController.navigate(route = route)  })
-                            TopLogOut(
-                                navigateTo = { route -> navHostController.navigate(route = route) },
-                                firebaseAuth = fbAuth
-                            )
+                            //TopLogOut(navigateTo = { route -> navHostController.navigate(route = route) }, firebaseAuth = fbAuth)
                         },
                         navigateTo = { route -> navHostController.navigate(route) },
                         modifierTopBar = modifierTopBar,
@@ -277,7 +274,7 @@ fun NavigationComponent(
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
                     Row() {
-                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
+                        Column(modifier = Modifier.fillMaxWidth(1.0f)) {
 
                             MessagesScreen(
                                 topBack = {
@@ -300,8 +297,10 @@ fun NavigationComponent(
                                 modifierScaffold = modifierScaffold,
                             )
                         }
+                        /*
                         Column(modifier = Modifier.fillMaxWidth()) {
                             AddMessageScreen(
+                                contextId = it.arguments?.getString("contextId","") ?: "",
                                 topBack = {
                                     TopBack(
                                         isHome = false,
@@ -322,6 +321,8 @@ fun NavigationComponent(
                                 modifierScaffold = modifierScaffold,
                             )
                         }
+
+                         */
                     }
                 }
 
@@ -356,6 +357,7 @@ fun NavigationComponent(
         }
         //Add Message Screen
         composable(
+            arguments = listOf(navArgument("contextId") { defaultValue = "" }),
             route= Screen.AddMessageScreen.route) {
             Column() {
                 navHistory(navHostController = navHostController)
@@ -363,7 +365,7 @@ fun NavigationComponent(
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
                     Row() {
-                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
+                        Column(modifier = Modifier.fillMaxWidth(0.5f)) {
 
                             MessagesScreen(
                                 topBack = {
@@ -388,6 +390,7 @@ fun NavigationComponent(
                         }
                         Column(modifier = Modifier.fillMaxWidth()) {
                             AddMessageScreen(
+                                contextId = it.arguments?.getString("contextId","") ?: "",
                                 topBack = {
                                     TopBack(
                                         isHome = false,
@@ -414,6 +417,7 @@ fun NavigationComponent(
                 // PORTRAIT ORIENTATION
                 else {
                     AddMessageScreen(
+                        contextId = it.arguments?.getString("contextId","") ?: "",
                         topBack = {
                             TopBack(
                                 isHome = false,
@@ -451,7 +455,7 @@ fun NavigationComponent(
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
                     Row() {
-                        Column(modifier = Modifier.fillMaxWidth(0.4f)) {
+                        Column(modifier = Modifier.fillMaxWidth(0.5f)) {
 
                             MessagesScreen(
                                 topBack = {

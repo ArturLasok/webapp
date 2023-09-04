@@ -214,18 +214,19 @@ class ApiInteraction(
     }
     fun ktor_deleteOneMessage(
         key: String,
+        mail: String,
         messageId: String
     ) : Flow<Boolean> = flow {
         try {
 
             //ktor insert
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_deleteonemessage") {
+                ktorClient.post("$baseLink/web_deletemessage") {
                     contentType(ContentType.Application.Json)
-                    setBody(Pair(key,messageId))
+                    setBody(Triple(key,mail,messageId))
                 }
             Log.i(TAG, "KTOR delete one message response: ${response.status}")
-            if(response.status.value==201) { emit(true) }
+            if(response.status.value==200) { emit(true) }
             else { emit(false) }
         } catch(e:java.lang.Exception) {
             Log.i(TAG, "KTOR delete on message exception: ${e.message}")
