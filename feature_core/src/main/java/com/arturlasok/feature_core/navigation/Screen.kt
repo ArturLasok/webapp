@@ -18,7 +18,7 @@ sealed class  Screen(val route:String, val routeWithArgs:String,val arguments: L
 
     object ProfileScreen:Screen("ProfileScreen","ProfileScreen", emptyList(),R.string.Screen_Profile)
 
-    object MessagesScreen:Screen("MessagesScreen","MessagesScreen", emptyList(),R.string.Screen_Messages)
+    object MessagesScreen:Screen("MessagesScreen?sent={sent}&delete={delete}","MessagesScreen", emptyList(),R.string.Screen_Messages)
 
     object AddMessageScreen:Screen("AddMessageScreen?contextId={contextId}","AddMessageScreen", emptyList(),R.string.Screen_AddMessages)
 

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,12 +29,10 @@ import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
-import com.arturlasok.webapp.feature_auth.presentation.auth_messages.MessagesViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun AddMessageScreen(
-    messagesViewModel: MessagesViewModel = hiltViewModel(),
     addMessageViewModel: AddMessageViewModel = hiltViewModel(),
     contextId: String,
     topBack: @Composable () -> Unit,
@@ -48,7 +45,9 @@ fun AddMessageScreen(
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val scaffoldState = rememberScaffoldState()
     val dataStoreDarkTheme = addMessageViewModel.darkFromStore().collectAsState(initial = 0)
+    Log.i(TAG,"AddNew STATE ${addMessageViewModel.newMessageDataState.value}")
     LaunchedEffect(key1 = true, block = {
+
         //load data if message have context
         if(contextId.isNotEmpty()) {
             addMessageViewModel.getOneMessageFromRoom(contextId)
@@ -68,16 +67,8 @@ fun AddMessageScreen(
             }
             is ProfileInteractionState.IsSuccessful -> {
 
-                snackMessage(
-                    snackType = SnackType.NORMAL,
-                    message = (addMessageViewModel.newMessageDataState.value.newMessageSendInteractionState.value as ProfileInteractionState.IsSuccessful).message,
-                    actionLabel = UiText.StringResource(R.string.auth_ok, "asd")
-                        .asString(addMessageViewModel.applicationContext.applicationContext),
-                    snackbarController = snackbarController,
-                    scaffoldState = scaffoldState
-                )
-                messagesViewModel.getAllMessagesFromKtor()
                 (addMessageViewModel.newMessageDataState.value.newMessageSendInteractionState.value as ProfileInteractionState.IsSuccessful).action.invoke()
+                navigateTo(Screen.MessagesScreen.routeWithArgs + "?sent=true&delete=0")
             }
             is ProfileInteractionState.Error -> {
                 snackMessage(
@@ -142,7 +133,6 @@ fun AddMessageScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("arg:$contextId")
                 AddMessageForm(
                     setNewMessage = { message -> addMessageViewModel.setNewMessageText(message) },
                     setNewMessageTopic = { messageTopic -> addMessageViewModel.setNewMessageTopic(messageTopic)  },

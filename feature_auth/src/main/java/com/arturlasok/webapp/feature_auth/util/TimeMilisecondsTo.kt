@@ -15,7 +15,7 @@ fun TimeMilisecondsTo(dateTimeType: DateTimeType,milliseconds: Long) :String {
         {
             LocalDateTime.ofEpochSecond(
                 TimeUnit.MILLISECONDS.toSeconds(milliseconds),0,
-                ZoneOffset.UTC).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                OffsetDateTime.now().offset).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
         }
         DateTimeType.TIME_H_AND_MIN ->
         {

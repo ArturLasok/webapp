@@ -1,4 +1,4 @@
-package com.arturlasok.webapp.feature_auth.data.datasource.api.model
+package com.arturlasok.feature_core.data.datasource.api.model
 
 import kotlinx.serialization.Serializable
 

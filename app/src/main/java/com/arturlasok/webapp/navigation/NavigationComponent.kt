@@ -5,7 +5,12 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
@@ -14,7 +19,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.TopBack
-import com.arturlasok.feature_core.presentation.components.TopLogOut
 import com.arturlasok.feature_core.presentation.components.TopMessages
 import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
@@ -27,19 +31,45 @@ import com.arturlasok.webapp.feature_auth.presentation.auth_messages.MessagesScr
 import com.arturlasok.webapp.feature_auth.presentation.auth_onemessage.OneMessagesScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_profile.ProfileScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_reg.RegScreen
+import com.arturlasok.webapp.model.UserMobileCheckState
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun NavigationComponent(
+    checkMobileToken:() -> Unit,
+    mobileCheckState: UserMobileCheckState,
+    changeStateMobileCheckState:(newState: UserMobileCheckState) -> Unit,
+    setUserStayOnThisDevice:() -> Unit,
     navHostController: NavHostController,
     modifierTopBar: Modifier,
-    modifierScaffold: Modifier
+    modifierScaffold: Modifier,
+    firebaseAuth: FirebaseAuth,
 ) {
-    //For test
+    //For all routes
     @Composable
-    fun navHistory(navHostController: NavHostController)  {
-       //Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
-       //    it.destination.route.toString()
-       // }} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
+    fun navTasks(navHostController: NavHostController)  {
+        //reaction to device selection by user
+        LaunchedEffect(key1 = mobileCheckState, block = {
+            when(mobileCheckState) {
+                is UserMobileCheckState.Stay -> {
+                    setUserStayOnThisDevice()
+                    //changeStateMobileCheckState(UserMobileCheckState.Idle)
+                }
+                is UserMobileCheckState.LogOut -> {
+                    firebaseAuth.signOut();
+                    changeStateMobileCheckState(UserMobileCheckState.Idle)
+                    navHostController.navigate(Screen.StartScreen.routeWithArgs+"?logOut=true&email=none")
+                }
+                else -> {
+                   //nothing
+                }
+            }
+
+        })
+        //NAV Queue
+        //Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
+        //   it.destination.route.toString()
+        //}} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
     }
 
     NavHost(
@@ -59,13 +89,14 @@ fun NavigationComponent(
             if(it.arguments?.getString("logOut") =="true") {
                 Log.i(TAG,"Remove profile logout: YES")
                 navHostController.backQueue.removeAll { nbe->
-                    nbe.destination.route == "ProfileScreen"
+                    nbe.destination.route?.contains("StartScreen") == false
                 }
             }
 
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 StartScreen(
+
                     navigateTo = { route-> navHostController.navigate(route)},
                     navigateUp = { navHostController.popBackStack()},
                     navScreenLabel =  UiText.StringResource(Screen.StartScreen.label,"asd").asString(),
@@ -81,7 +112,7 @@ fun NavigationComponent(
         composable(
             route= Screen.SettingsScreen.route) {
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 SettingsScreen(
                     isSecondScreen = false,
                     isInDualMode = false,
@@ -101,7 +132,7 @@ fun NavigationComponent(
             route= Screen.AuthScreen.route) {
 
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 LoginScreen(
                    navigateTo = {route->
                        //if next is Profile after login then remove AuthScreens from backQueue
@@ -141,7 +172,7 @@ fun NavigationComponent(
         composable(
             route= Screen.RegScreen.route) {
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 RegScreen(
                     navigateTo = { route->
 
@@ -172,7 +203,7 @@ fun NavigationComponent(
         composable(
             route= Screen.ForgotScreen.route) {
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 ForgotScreen(
                     navigateTo = { route-> navHostController.navigate(route)},
                     navigateUp = { navHostController.popBackStack()},
@@ -182,16 +213,18 @@ fun NavigationComponent(
                 )
 
             }
-
-
-
         }
         // ProfileScreen
         composable(
             route= Screen.ProfileScreen.route) {
             Column() {
-                navHistory(navHostController = navHostController)
-
+                navTasks(navHostController = navHostController)
+                val notViewed = remember {
+                    mutableStateOf(0)
+                }
+                LaunchedEffect(key1 = true, block = {
+                    checkMobileToken()
+                })
                 //LANDSCAPE ORIENTATION -> Dual Screen
                 if(LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
@@ -199,6 +232,7 @@ fun NavigationComponent(
                         Column(modifier = Modifier.fillMaxWidth(0.5f)) {
 
                             ProfileScreen(
+                                notViewed = { },
                                 topBack = {
                                     TopBack(
                                         isHome = false,
@@ -218,6 +252,7 @@ fun NavigationComponent(
                         }
                         Column(modifier = Modifier.fillMaxWidth()) {
                             MessagesScreen(
+                                isDualMode = false,
                                 topBack = {
                                     TopBack(
                                         isHome = false,
@@ -242,6 +277,7 @@ fun NavigationComponent(
                 // PORTRAIT ORIENTATION
                 else {
                     ProfileScreen(
+                        notViewed = { number -> notViewed.value = number },
                         topBack = {
                             TopBack(
                                 isHome = false,
@@ -255,7 +291,7 @@ fun NavigationComponent(
                             { navHostController.navigate(Screen.StartScreen.route) }
                         },
                         topEnd = { fbAuth ->
-                            TopMessages(navigateTo = {route -> navHostController.navigate(route = route)  })
+                            TopMessages(navigateTo = {route -> navHostController.navigate(route = route)  },notViewed.value)
                             //TopLogOut(navigateTo = { route -> navHostController.navigate(route = route) }, firebaseAuth = fbAuth)
                         },
                         navigateTo = { route -> navHostController.navigate(route) },
@@ -267,68 +303,32 @@ fun NavigationComponent(
         }
         // Messages List Screen
         composable(
+            arguments = listOf(navArgument("sent") { defaultValue = false },navArgument("delete") { defaultValue = "" }),
             route= Screen.MessagesScreen.route) {
-            Column() {
-                navHistory(navHostController = navHostController)
-                //LANDSCAPE ORIENTATION -> Dual Screen
-                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    Log.i(TAG, "orient: land")
-                    Row() {
-                        Column(modifier = Modifier.fillMaxWidth(1.0f)) {
+            val sent = it.arguments?.getBoolean("sent",false) ?: false
+            if((it.arguments?.getBoolean("sent") == true)
+            ) {
+                Log.i(
+                    TAG,
+                    "REMOVE BECOSE SENT! ${navHostController.backQueue.last().destination.route}"
+                )
+                navHostController.backQueue.removeAll { nbe ->
+                    nbe.destination.route?.contains("AddMessageScreen") ?: false
 
-                            MessagesScreen(
-                                topBack = {
-                                    TopBack(
-                                        isHome = false,
-                                        isSecondScreen = false,
-                                        isInDualMode = true,
-                                        routeLabel = UiText.StringResource(
-                                            Screen.MessagesScreen.label,
-                                            "asd"
-                                        ).asString(),
-                                        onBack = { navHostController.popBackStack() })
-                                    { navHostController.navigate(Screen.StartScreen.route) }
-                                },
-                                topEnd = {
-                                },
-                                currentRoute = it.destination.route.toString(),
-                                navigateTo = { route -> navHostController.navigate(route) },
-                                modifierTopBar = modifierTopBar,
-                                modifierScaffold = modifierScaffold,
-                            )
-                        }
-                        /*
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            AddMessageScreen(
-                                contextId = it.arguments?.getString("contextId","") ?: "",
-                                topBack = {
-                                    TopBack(
-                                        isHome = false,
-                                        isSecondScreen = true,
-                                        isInDualMode = true,
-                                        routeLabel = UiText.StringResource(
-                                            Screen.AddMessageScreen.label,
-                                            "asd"
-                                        ).asString(),
-                                        onBack = { navHostController.popBackStack() })
-                                    { navHostController.navigate(Screen.StartScreen.route) }
-                                },
-                                topEnd = {
-
-                                },
-                                navigateTo = { route -> navHostController.navigate(route) },
-                                modifierTopBar = modifierTopBar,
-                                modifierScaffold = modifierScaffold,
-                            )
-                        }
-
-                         */
-                    }
                 }
-
-                // PORTRAIT ORIENTATION
-                else {
+                navHostController.currentBackStackEntry?.arguments?.clear()
+            }
+            val delete = it.arguments?.getString("delete","") ?: ""
+            Log.i(TAG, "DELETE NAV ARG VAL: ${delete}")
+            LaunchedEffect(key1 = true, block = {
+                checkMobileToken()
+            })
+            Column() {
+                navTasks(navHostController = navHostController)
                     MessagesScreen(
+                        delete = delete,
+                        sent = sent,
+                        isDualMode = false,
                         topBack = {
                             TopBack(
                                 isHome = false,
@@ -349,18 +349,17 @@ fun NavigationComponent(
                         modifierTopBar = modifierTopBar,
                         modifierScaffold = modifierScaffold,
                     )
-
-                }
             }
-
-
         }
         //Add Message Screen
         composable(
             arguments = listOf(navArgument("contextId") { defaultValue = "" }),
             route= Screen.AddMessageScreen.route) {
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
+                LaunchedEffect(key1 = true, block = {
+                    checkMobileToken()
+                })
                 //LANDSCAPE ORIENTATION -> Dual Screen
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
@@ -368,6 +367,7 @@ fun NavigationComponent(
                         Column(modifier = Modifier.fillMaxWidth(0.5f)) {
 
                             MessagesScreen(
+                                isDualMode = true,
                                 topBack = {
                                     TopBack(
                                         isHome = false,
@@ -406,7 +406,7 @@ fun NavigationComponent(
                                 topEnd = {
 
                                 },
-                                navigateTo = { route -> navHostController.navigate(route) },
+                                navigateTo = { route -> navHostController.navigate(route)},
                                 modifierTopBar = modifierTopBar,
                                 modifierScaffold = modifierScaffold,
                             )
@@ -448,9 +448,11 @@ fun NavigationComponent(
             route= Screen.OneMessageScreen.route,
             arguments = listOf(navArgument("mesId") { defaultValue = "-1" })
         ) {
-
+            LaunchedEffect(key1 = true, block = {
+                checkMobileToken()
+            })
             Column() {
-                navHistory(navHostController = navHostController)
+                navTasks(navHostController = navHostController)
                 //LANDSCAPE ORIENTATION -> Dual Screen
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Log.i(TAG, "orient: land")
@@ -458,6 +460,7 @@ fun NavigationComponent(
                         Column(modifier = Modifier.fillMaxWidth(0.5f)) {
 
                             MessagesScreen(
+                                isDualMode = true,
                                 topBack = {
                                     TopBack(
                                         isHome = false,

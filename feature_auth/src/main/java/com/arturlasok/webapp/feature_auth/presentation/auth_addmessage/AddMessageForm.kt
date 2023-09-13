@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -213,8 +214,9 @@ fun AddMessageForm(
                     },
                     value = topicField.value,
                     onValueChange = { newInput ->
+                        if(newInput.text.length<120) {
                         topicField.value =  newInput
-                        setNewMessageTopic(newInput.text)
+                        setNewMessageTopic(newInput.text) }
                     },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
@@ -279,9 +281,11 @@ fun AddMessageForm(
                     },
                     value = textField.value,
                     onValueChange = { newInput ->
-                        textField.value =  newInput
-                        //isValidEmail.value = isValidEmailString(textField.value.text)
-                        setNewMessage(newInput.text)
+                        if(newInput.text.length<2500) {
+                            textField.value = newInput
+                            //isValidEmail.value = isValidEmailString(textField.value.text)
+                            setNewMessage(newInput.text)
+                        }
                                     },
                     shape = MaterialTheme.shapes.large,
                     singleLine = false,

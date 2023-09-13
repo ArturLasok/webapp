@@ -1,8 +1,8 @@
 package com.arturlasok.webapp.di
 
 import com.arturlasok.feature_core.data.datasource.room.MessageDao
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,4 +25,5 @@ object InteractionsModule {
         ktorClient: HttpClient) : ApiInteraction {
         return ApiInteraction(ktorClient = ktorClient)
     }
+
 }

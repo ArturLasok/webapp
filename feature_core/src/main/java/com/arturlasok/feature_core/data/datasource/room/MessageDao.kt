@@ -26,11 +26,11 @@ interface MessageDao {
     @Query("SELECT * FROM MESSAGE_ROOM WHERE _id=:messageIdRoom")
     suspend fun selectOneMessageByIdFromRoom(messageIdRoom: String) : MessageEntity
 
-    @Query("SELECT count(*) FROM message_room WHERE message_viewedbyuser_room=0")
-    fun selectCountMessagesFlowNotViewedFromRoom() : Flow<Int>
+    @Query("SELECT count(*) FROM message_room WHERE message_sync_room=-1 AND message_author_mail_room!=:userMail")
+    fun selectCountMessagesFlowNotViewedFromRoom(userMail:String) : Flow<Int>
 
-    @Query("UPDATE message_room SET message_viewedbyuser_room=:messageViewedLong WHERE message_id_room=:messageIdRoom")
-    fun updateOneMessageSetViewedByUserInRoom(messageViewedLong: Long,messageIdRoom: Long) : Int
+    @Query("UPDATE message_room SET message_sync_room=:messageViewedLong WHERE _id=:messageIdRoom")
+    suspend fun updateOneMessageSetViewedByUserInRoom(messageViewedLong: Long,messageIdRoom: String)
 
 
 

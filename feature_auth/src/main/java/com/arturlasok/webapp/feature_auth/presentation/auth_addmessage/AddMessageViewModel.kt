@@ -12,8 +12,8 @@ import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.NewMessageDataState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
@@ -104,7 +104,7 @@ class AddMessageViewModel @Inject constructor(
     fun getOneMessageFromRoom(messageId:String) {
 
         roomInteraction.getOneMessagesFromRoom(messageId).onEach { one->
-            Log.i(TAG, "Add mess re: ${one.dMessage_title}")
+
             setNewMessageTo(one.dMessage_author_mail)
 
             setNewMessageTopic((if(one.dMessage_title.contains("Re: ")) { "" } else "Re: ")+one.dMessage_title)

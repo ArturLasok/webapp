@@ -16,8 +16,12 @@
     <string name="auth_send">Send</string>
     <string name="auth_notopic">Add a message title</string>
     <string name="auth_nomessageContent">Add message content</string>
+    <string name="auth_emptyMessageList">This tab does not contain messages</string>
     <string name="auth_messageSent">Message sent</string>
     <string name="auth_messageDelete">Message deleted</string>
+    <string name="auth_oneMessage_notExists">This message is not available. It has probably been deleted.</string>
+    <string name="auth_inbox">IN BOX</string>
+    <string name="auth_outbox">OUT BOX</string>
     <string name="auth_clear">Clear</string>
     <string name="auth_verify">Check verification</string>
     <string name="auth_verify_failed">Your account is still not verified. Click on the link received in the e-mail during registration or send the link again.</string>

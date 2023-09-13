@@ -7,6 +7,10 @@
     <string name="core_settings">Settings</string>
     <string name="core_deleteIcon">Delete</string>
     <string name="core_replyIcon">Reply</string>
+    <string name="core_oteherDeviceInfo">You are using the application on another device. You can stay here and log out another device, or continue using another device and log out here.</string>
+    <string name="core_otherDeviceStay">Stay here</string>
+    <string name="core_otherDeviceLogOUt">Log out of this device</string>
+    <string name="core_accountBlocked">Your account is blocked by the application administrator.</string>
     <string name="Screen_Start">Home</string>
     <string name="Screen_Settings">Settings</string>
     <string name="Screen_Auth">Log In</string>

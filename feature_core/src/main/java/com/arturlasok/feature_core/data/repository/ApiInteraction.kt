@@ -1,4 +1,4 @@
-package com.arturlasok.webapp.feature_auth.data.repository
+package com.arturlasok.feature_core.data.repository
 
 
 import android.os.Build
@@ -8,7 +8,7 @@ import com.arturlasok.feature_core.BuildConfig
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
-import com.arturlasok.webapp.feature_auth.data.datasource.api.model.WebUser
+import com.arturlasok.feature_core.data.datasource.api.model.WebUser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.client.HttpClient
@@ -20,12 +20,9 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 
 class ApiInteraction(
@@ -77,6 +74,8 @@ class ApiInteraction(
         }
     }
     private val baseLink = BuildConfig.BASEAPIURL
+    private val appbase = BuildConfig.APPURL
+
     fun getServerTime() : Flow<String> = flow {
         emit(ktorClient.get("$baseLink/servertime-plu").bodyAsText())
     }
@@ -88,11 +87,36 @@ class ApiInteraction(
 
         try {
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_getuserdata") {
+                ktorClient.post("$baseLink/${appbase}_getuserdata") {
                     contentType(ContentType.Application.Json)
                     setBody(Pair(key,mail))
                 }
             val json = response.body<WebUser>()
+            Log.i(TAG, "KTOR get user resp: ${response.status} js $json")
+            //if(response.status.value==302) { emit(true) } else { emit(false) }
+            emit(json)
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get user data exception: ${e.message}")
+            //do nothing
+            emit(WebUser())
+        }
+    }
+    // checkmobiletoken
+    fun ktor_checkMobileToken(
+        key:String,
+        mail: String
+    ) : Flow<WebUser> = flow  {
+
+        try {
+
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_checkmobiletoken") {
+                    contentType(ContentType.Application.Json)
+                    setBody(Pair(key,mail))
+                }
+            val json = response.body<WebUser>()
+            Log.i(TAG, "CHECK MOBILE TOKEN RESPONSE IN API INTER")
             Log.i(TAG, "KTOR get user resp: ${response.status} js $json")
             //if(response.status.value==302) { emit(true) } else { emit(false) }
             emit(json)
@@ -111,7 +135,7 @@ class ApiInteraction(
 
         try {
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_updateverificationtotrue") {
+                ktorClient.post("$baseLink/${appbase}_updateverificationtotrue") {
                     contentType(ContentType.Application.Json)
                     setBody(Pair(key,mail))
                 }
@@ -127,20 +151,24 @@ class ApiInteraction(
     }
     //Insert and update user on login or on registration
     fun ktor_insertOrUpdateUser(
+        token: String = "",
         key: String,
         mail:String,
         simCountry:String,
     ) : Flow<Boolean> = flow {
         try {
+
+
             val lang = Locale.current.region
             val model = Build.MODEL
             //ktor insert
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_addorupdateuser") {
+                ktorClient.post("$baseLink/${appbase}_addorupdateuser") {
                     contentType(ContentType.Application.Json)
-                    setBody(WebUser(
+                    setBody(
+                        WebUser(
                         webUserKey = key,
-                        webUserToken = "empty",
+                        webUserToken = token,
                         webUserBlocked= false,
                         webUserMail = mail,
                         webVerified = false,
@@ -151,6 +179,7 @@ class ApiInteraction(
                     )
                     )
                 }
+            Log.i(TAG, "3.  MOBILE UPDATED USER IN Api")
             Log.i(TAG, "KTOR insert/update user response: ${response.status}")
             //201 CREATED 302 FOUND
             if(response.status.value==201 || response.status.value==302) { emit(true) }
@@ -170,7 +199,7 @@ class ApiInteraction(
 
             //ktor insert
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_addmessage") {
+                ktorClient.post("$baseLink/${appbase}_addmessage") {
                     contentType(ContentType.Application.Json)
                     setBody(Pair(key,message))
                 }
@@ -194,7 +223,7 @@ class ApiInteraction(
         Log.i(TAG, "Room message id list before sent to ktor: ${ listOfMessageIdNowInRoom.size}")
         try {
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_getallmessages") {
+                ktorClient.post("$baseLink/${appbase}_getallmessages") {
                     contentType(ContentType.Application.Json)
                     setBody(Triple(key,mail,  listOfMessageIdNowInRoom))
                 }
@@ -221,7 +250,7 @@ class ApiInteraction(
 
             //ktor insert
             val response: HttpResponse =
-                ktorClient.post("$baseLink/web_deletemessage") {
+                ktorClient.post("$baseLink/${appbase}_deletemessage") {
                     contentType(ContentType.Application.Json)
                     setBody(Triple(key,mail,messageId))
                 }

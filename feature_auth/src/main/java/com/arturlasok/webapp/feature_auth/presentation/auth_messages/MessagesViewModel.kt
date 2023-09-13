@@ -3,7 +3,11 @@ package com.arturlasok.webapp.feature_auth.presentation.auth_messages
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,15 +18,19 @@ import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
+import com.arturlasok.webapp.feature_auth.model.MessageListGlobalState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,35 +39,32 @@ class MessagesViewModel @Inject constructor(
     private val application: Application,
     private val isOnline: isOnline,
     private val fireAuth: FirebaseAuth,
-    private val dataStoreInteraction: DataStoreInteraction,
+    val dataStoreInteraction: DataStoreInteraction,
     private val apiInteraction: ApiInteraction,
-    private val roomInteraction: RoomInteraction
+    private val roomInteraction: RoomInteraction,
+    private val messagesListGlobalState: MessageListGlobalState
     ):ViewModel() {
 
     val deleteOneState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle)
     val getKtorMessagesState = mutableStateOf<ProfileInteractionState>(ProfileInteractionState.Idle)
-    val messageList = mutableStateOf<List<Message>>(listOf())
+    val messageList = savedStateHandle.getStateFlow("messages", mutableListOf<Message>())
+    val deletedItems =  mutableStateListOf<String>()
     val applicationContext = application
     val messageToDeleteId = mutableStateOf("")
-    private val currentMailTabPosition = mutableStateOf(0)
-
+    val messageSentView = mutableStateOf(false)
 
     init {
-
-        Log.i(TAG, "init newses")
-        //getAllMessagesFromKtor()
-
-
+        Log.i(TAG, "init messages")
     }
-
-    fun getServerTime() {
-
-            apiInteraction.getServerTime().onEach {
-
-
-
-            }.launchIn(viewModelScope)
-
+    fun getMessagesGlobalState() : MessageListGlobalState {
+        return messagesListGlobalState
+    }
+    fun setSelectedMessage(messageId:String, tab: Int) {
+        messagesListGlobalState.currentBoxTabPosition.value = tab
+        messagesListGlobalState.setSelectedMessage(messageId)
+    }
+    fun setSelectedTab(tab:Int) {
+        messagesListGlobalState.currentBoxTabPosition.value = tab
     }
     fun darkFromStore() : Flow<Int> {
         return dataStoreInteraction.getDarkThemeInt()
@@ -76,17 +81,6 @@ class MessagesViewModel @Inject constructor(
     }
     fun getFireAuth() : FirebaseAuth {
         return fireAuth
-    }
-    private fun getMailFollowFromDataStore() : Flow<String> {
-        return dataStoreInteraction.getMailFollow()
-    }
-    //zwraca ADD Screen tab Asortymen position
-    fun getCurrentMailTabPos() : MutableState<Int> {
-        return currentMailTabPosition
-    }
-    //ustawia ADD Screen tab Asortyment position
-    fun setCurrentMailTabPos(index : Int) {
-        currentMailTabPosition.value = index
     }
     fun getAllMessagesFromKtor() {
         getKtorMessagesState.value = ProfileInteractionState.Interact(action = {})
@@ -111,19 +105,18 @@ class MessagesViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
     }
-    //fun getAllMessagesFromRoom() : Flow<List<MessageEntity>> = roomInteraction.getAllMessagesFromRoom()
 
+    fun checkIsOneOpenIsDeleted(doAction:() -> Unit, oneMessage: MutableState<Message>) {
+        if(oneMessage.value._did.toString()==messageToDeleteId.value) {
+            doAction()
+        }
+    }
     fun getAllMessagesFromRoom() {
 
         roomInteraction.getAllMessagesFromRoom().onEach {
             Log.i(TAG, "Room get message, now size: ${it.size}")
-            messageList.value = it
+            savedStateHandle["messages"] = it.toMutableList()
             getKtorMessagesState.value = ProfileInteractionState.OnComplete
-        }.launchIn(viewModelScope)
-    }
-    fun removeAllMessagesFromRoom() {
-        roomInteraction.deleteAllMessagesFromRoom().onEach {
-            Log.i(TAG, "Room all message delete $it")
         }.launchIn(viewModelScope)
     }
     fun deleteOneMessage(messageId: String) {
@@ -131,13 +124,18 @@ class MessagesViewModel @Inject constructor(
 
        if(getFireAuth().currentUser!=null) { getFireAuth().currentUser?.let { user ->
             apiInteraction.ktor_deleteOneMessage(user.uid, user.email ?: "", messageId).onEach { result ->
+
                 Log.i(TAG, "delete result: $result")
                 if (result) {
+                    deletedItems.add(messageId)
+                    delay(1000)
+                    getMessagesGlobalState().itemToDeleteSelection.value = ""
                     roomInteraction.deleteMessageFromRoom(messageId).launchIn(viewModelScope)
                     deleteOneState.value = ProfileInteractionState.IsSuccessful(
                         message = UiText.StringResource(R.string.auth_messageDelete, "asd")
                             .asString(applicationContext),
                         action = fun() {
+
                             getAllMessagesFromRoom()
                             messageToDeleteId.value = ""
                             deleteOneState.value = ProfileInteractionState.Idle
@@ -147,6 +145,7 @@ class MessagesViewModel @Inject constructor(
                         message = UiText.StringResource(R.string.auth_fberror_internal, "asd")
                             .asString(applicationContext),
                         action = fun() {
+                            getMessagesGlobalState().itemToDeleteSelection.value = ""
                             messageToDeleteId.value = ""
                             deleteOneState.value = ProfileInteractionState.Idle
                         }
@@ -161,6 +160,7 @@ class MessagesViewModel @Inject constructor(
                message = UiText.StringResource(R.string.auth_fberror_internal,"asd").asString(applicationContext),
                action = fun()
                {
+                   getMessagesGlobalState().itemToDeleteSelection.value = ""
                    messageToDeleteId.value = ""
                    deleteOneState.value  = ProfileInteractionState.Idle
                }

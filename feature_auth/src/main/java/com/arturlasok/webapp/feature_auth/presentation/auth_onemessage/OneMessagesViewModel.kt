@@ -6,13 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
+import com.arturlasok.webapp.feature_auth.model.MessageListGlobalState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -28,40 +28,22 @@ class OneMessagesViewModel @Inject constructor(
     private val fireAuth: FirebaseAuth,
     private val dataStoreInteraction: DataStoreInteraction,
     private val apiInteraction: ApiInteraction,
-    private val roomInteraction: RoomInteraction
+    private val roomInteraction: RoomInteraction,
+    private val messagesListGlobalState: MessageListGlobalState
+
     ):ViewModel() {
 
     val oneMessage = mutableStateOf(Message())
-    val messageList = mutableStateOf<List<Message>>(listOf())
     val applicationContext = application
 
-
     init {
-
         Log.i(TAG, "init one message")
-
-
-
     }
-
-    fun getServerTime() {
-
-            apiInteraction.getServerTime().onEach {
-
-
-
-            }.launchIn(viewModelScope)
-
+    fun getMessagesGlobalState() : MessageListGlobalState {
+        return messagesListGlobalState
     }
     fun darkFromStore() : Flow<Int> {
         return dataStoreInteraction.getDarkThemeInt()
-    }
-    private fun getUserMail() : String {
-        return getFireAuth().currentUser?.email ?: "empty"
-    }
-    fun getIsVerified() : Boolean {
-        val ver = getFireAuth().currentUser?.isEmailVerified ?: false
-        return ver
     }
     fun haveNetwork() : Boolean {
         return isOnline.isNetworkAvailable.value
@@ -69,22 +51,25 @@ class OneMessagesViewModel @Inject constructor(
     fun getFireAuth() : FirebaseAuth {
         return fireAuth
     }
-    private fun getMailFollowFromDataStore() : Flow<String> {
-        return dataStoreInteraction.getMailFollow()
-    }
+    fun getOneMessageFromRoom() {
+        messagesListGlobalState.getSelectedMessage().onEach {
 
-    //fun getAllMessagesFromRoom() : Flow<List<MessageEntity>> = roomInteraction.getAllMessagesFromRoom()
+            roomInteraction.getOneMessagesFromRoom(it).onEach { one->
 
-    fun getAllMessagesFromRoom() {
-        roomInteraction.getAllMessagesFromRoom().onEach {
-            Log.i(TAG, "Room message size: ${it.size}")
-            messageList.value = it
+                if(one.dMessage_sync<0L) {
+                    updateSyncBecauseIsViewedByUser(one._did.toString())
+                }
+                oneMessage.value = one
+            }.launchIn(viewModelScope)
+
         }.launchIn(viewModelScope)
+
     }
-    fun getOneMessageFromRoom(messageId:String) {
-        roomInteraction.getOneMessagesFromRoom(messageId).onEach { one->
-            oneMessage.value = one
+    fun updateSyncBecauseIsViewedByUser(messageId: String) {
+        roomInteraction.updateOneMessageSetSync(messageId,System.currentTimeMillis()).onEach {
+
         }.launchIn(viewModelScope)
+
     }
 
 

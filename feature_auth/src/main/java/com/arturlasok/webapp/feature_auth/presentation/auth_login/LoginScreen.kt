@@ -189,7 +189,7 @@ fun LoginScreen(
                             .asString(),
                         textPadding = 80.dp,
                         buttonAction = {
-                            authState.value = AuthState.Idle
+                            authState.value = AuthState.Interact
                             loginViewModel.login()
                         },
                         buttonEnabled = loginViewModel.isLoginButtonEnabled(),

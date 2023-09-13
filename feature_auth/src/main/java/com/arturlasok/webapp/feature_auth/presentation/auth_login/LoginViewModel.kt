@@ -13,8 +13,8 @@ import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.AuthLoginDataState
 import com.arturlasok.webapp.feature_auth.model.AuthState
 import com.arturlasok.webapp.feature_auth.util.fireBaseErrors
@@ -101,6 +101,15 @@ class LoginViewModel @Inject constructor(
     fun getFireAuth() : FirebaseAuth {
         return fireAuth
     }
+    private fun setMobileTokenInDataStore(token: String) {
+        Log.i(TAG, "4. SET MOBILE TOKEN IN DATASTORE -> LOGIN VIEW MODEL")
+        viewModelScope.launch{
+            dataStoreInteraction.setMobileToken(token)
+        }
+    }
+    fun getMobileTokenStore() : Flow<String> {
+        return dataStoreInteraction.getMobileToken()
+    }
     fun ifFormIsOk() : Boolean {
         val EMAIL_ADDRESS_PATTERN = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
@@ -119,6 +128,7 @@ class LoginViewModel @Inject constructor(
     }
     fun dbSyncInsertOrUpdateUser() {
         if (getFireAuth().currentUser != null) {
+            Log.i(TAG, "1. INSERT MOBILE TOKEN TO KTOR IN DBSYNC")
             getFireAuth().currentUser?.let { ktorInsertOrUpdateUser(it) }
         } else {
             authState.value = AuthState.AuthError(
@@ -133,13 +143,23 @@ class LoginViewModel @Inject constructor(
         try {
             val sim = application.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             val tmr = sim.networkCountryIso
+            val unixTime = System.currentTimeMillis() / 1000L
+            val allowedChars = ('A'..'Z') + ('a'..'s') + ('0'..'9')
+            val genTokenForThisMobile: () -> String = fun() : String {
+                return (1..16)
+                    .map { allowedChars.random() }
+                    .joinToString("")
+            }
+            val token =  unixTime.toString()+"time"+genTokenForThisMobile.invoke()
+            Log.i(TAG, "2. MOBILE TOKEN GENERATING")
             apiInteraction.ktor_insertOrUpdateUser(
+                token = token,
                 key = user.uid,
                 mail = user.email ?: "null",
                 simCountry = tmr
             ).onEach { response ->
                 if (response) {
-
+                    setMobileTokenInDataStore(token)
                     if (user.isEmailVerified) {
                         apiInteraction.ktor_updateUserVerificationToTrue(
                             user.uid,

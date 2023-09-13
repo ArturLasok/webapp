@@ -199,7 +199,7 @@ fun RegScreen(
                                 .asString(),
                             textPadding = 80.dp,
                             buttonAction = {
-                                //authState.value = AuthState.Idle
+                                authState.value = AuthState.Interact
                                 regViewModel.register()
                             },
                             buttonEnabled = regViewModel.isRegButtonEnabled(),

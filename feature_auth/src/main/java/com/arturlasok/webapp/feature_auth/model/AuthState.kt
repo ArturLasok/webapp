@@ -2,6 +2,7 @@ package com.arturlasok.webapp.feature_auth.model
 
 sealed class AuthState {
     object Idle : AuthState()
+    object Interact : AuthState()
     object DbSync : AuthState()
     object DbSyncError: AuthState()
     object Success : AuthState()

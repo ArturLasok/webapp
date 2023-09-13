@@ -36,6 +36,7 @@ android {
     buildTypes {
         getByName("release") {
             buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
+            buildConfigField("String","APPURL","\"web\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -44,6 +45,7 @@ android {
         }
         getByName("debug") {
             buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
+            buildConfigField("String","APPURL","\"web\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

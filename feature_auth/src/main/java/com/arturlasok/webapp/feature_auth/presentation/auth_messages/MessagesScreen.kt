@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_core.R
+import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.AlertButton
 import com.arturlasok.feature_core.presentation.components.DefaultAlert
@@ -54,6 +56,9 @@ import kotlinx.coroutines.delay
 fun MessagesScreen(
     messagesViewModel: MessagesViewModel = hiltViewModel(),
     oneMessagesViewModel: OneMessagesViewModel = hiltViewModel(),
+    delete: String = "",
+    sent: Boolean = false,
+    isDualMode: Boolean,
     topBack: @Composable () -> Unit,
     topEnd: @Composable () -> Unit,
     currentRoute: String,
@@ -65,16 +70,49 @@ fun MessagesScreen(
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val scaffoldState = rememberScaffoldState()
     val dataStoreDarkTheme = messagesViewModel.darkFromStore().collectAsState(initial = 0)
+    val messagesList = messagesViewModel.messageList.collectAsState(initial = mutableListOf<Message>()).value
+    //
+    LaunchedEffect(key1 = sent, block = {
+        Log.i(TAG, "set TAB LF")
+        if(sent && !messagesViewModel.messageSentView.value) {
+            snackMessage(
+                snackType = SnackType.NORMAL,
+                message = UiText.StringResource(com.arturlasok.feature_auth.R.string.auth_messageSent, "asd")
+                    .asString(messagesViewModel.applicationContext),
+                actionLabel = UiText.StringResource(com.arturlasok.feature_auth.R.string.auth_ok, "asd")
+                    .asString(messagesViewModel.applicationContext),
+                snackbarController = snackbarController,
+                scaffoldState = scaffoldState
+            )
 
+            Log.i(TAG, "set TAB to 1")
+            messagesViewModel.setSelectedMessage("",1)
+            messagesViewModel.messageSentView.value  = true
+        }
+    })
+    LaunchedEffect(key1 = true, block = {
+        Log.i(TAG, "DELETE INTERACT ${ messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value}")
+        if(delete.isNotEmpty() && delete== messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value) {
+            Log.i(TAG, "DELETE INTERACT NOW!!!!!!!!")
+            messagesViewModel.messageToDeleteId.value = delete
+            messagesViewModel.deleteOneState.value = ProfileInteractionState.Interact(action = {})
+        }
+    })
+    //
     LaunchedEffect(key1 = true, block = {
         if(FirebaseAuth.getInstance().currentUser==null) {
             navigateTo(Screen.StartScreen.route)
         }
         messagesViewModel.getAllMessagesFromKtor()
     })
+
+
+
     if(messagesViewModel.deleteOneState.value is ProfileInteractionState.Interact) {
         DefaultAlert(
             onDismiss = {
+                messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value = ""
+                messagesViewModel.messageToDeleteId.value = "";
                 messagesViewModel.deleteOneState.value = ProfileInteractionState.Idle
             },
             title = "",
@@ -102,6 +140,7 @@ fun MessagesScreen(
                         buttonText = UiText.StringResource(R.string.core_no,"asd").asString(),
                         textPadding = 2.dp,
                         buttonAction = {
+                            messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value = ""
                             messagesViewModel.messageToDeleteId.value = "";
                             messagesViewModel.deleteOneState.value = ProfileInteractionState.Idle
                                        },
@@ -126,7 +165,10 @@ fun MessagesScreen(
                     snackbarController = snackbarController,
                     scaffoldState = scaffoldState
                 )
+                messagesViewModel.checkIsOneOpenIsDeleted(doAction = {oneMessagesViewModel.oneMessage.value = Message()}, oneMessage = oneMessagesViewModel.oneMessage)
+                messagesViewModel.deletedItems.add(messagesViewModel.messageToDeleteId.value)
                 (messagesViewModel.deleteOneState.value as ProfileInteractionState.IsSuccessful).action.invoke()
+
             }
             is ProfileInteractionState.Error -> {
                 snackMessage(
@@ -173,9 +215,14 @@ fun MessagesScreen(
             }
         },
         bottomBar ={
+            /*
             Column {
+                Text("messageSentView: ${messagesViewModel.messageSentView.value}")
+                Text("currentScreen: ${currentRoute}")
 
             }
+
+             */
 
         },
         floatingActionButton = {
@@ -218,12 +265,12 @@ fun MessagesScreen(
             )
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                //.verticalScroll(rememberScrollState())
-                ,
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                //Text(text = "TP: ${messagesViewModel.getMessagesGlobalState().currentBoxTabPosition.value} " +
+                //        "SM: ${messagesViewModel.getMessagesGlobalState().getSelectedMessage().collectAsState(initial = "").value}")
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     elevation = 10.dp,
@@ -265,17 +312,19 @@ fun MessagesScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     MessagesTabRow(
-                                        currentTabPosition = messagesViewModel.getCurrentMailTabPos().value,
+                                        currentTabPosition = messagesViewModel.getMessagesGlobalState().currentBoxTabPosition.value,
                                         setCurrentTabPosition = { pos ->
-                                            messagesViewModel.setCurrentMailTabPos(
-                                                pos
-                                            )
+                                            Log.i(TAG, "set TAB to $pos")
+                                            messagesViewModel.setSelectedTab(pos)
                                         })
+
                                     MessageList(
                                         darkTheme = dataStoreDarkTheme.value,
                                         fbAuth = messagesViewModel.getFireAuth(),
-                                        messagesList = messagesViewModel.messageList.value.filter {
-                                            if(messagesViewModel.getCurrentMailTabPos().value==0) {
+                                        rowClicked =  if(isDualMode && !currentRoute.contains("AddMessageScreen") && messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value.isEmpty()) messagesViewModel.getMessagesGlobalState().getSelectedMessage().collectAsState(initial = "").value else "",
+                                        messagesList = messagesList
+                                            .filter {
+                                            if(messagesViewModel.getMessagesGlobalState().currentBoxTabPosition.value==0) {
                                                 it.dMessage_author_mail != (messagesViewModel.getFireAuth().currentUser?.email
                                                     ?: "unknown")
                                             } else {
@@ -283,24 +332,33 @@ fun MessagesScreen(
                                                     ?: "unknown")
                                             }
 
+                                        }.toMutableStateList(),
+                                        deletedMessagesList = messagesViewModel.deletedItems,
+                                        toDeleteRowSelectedItemId = messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value,
+                                        deleteAction = { messageId, tab ->
+                                            messagesViewModel.getMessagesGlobalState().itemToDeleteSelection.value= messageId
+                                            messagesViewModel.messageToDeleteId.value = messageId;
+                                            messagesViewModel.deleteOneState.value = ProfileInteractionState.Interact(action = {})
                                         },
-                                        deleteAction = { messageId ->
-                                            messagesViewModel.messageToDeleteId.value =
-                                                messageId; messagesViewModel.deleteOneState.value =
-                                            ProfileInteractionState.Interact(action = {})
-                                        },
-                                        reAction = { messageId ->
+                                        reAction = { messageId, tab ->
+                                            messagesViewModel.setSelectedMessage(messageId,tab)
                                             Log.i(TAG, "Nav to add with $messageId")
                                             navigateTo(Screen.AddMessageScreen.routeWithArgs + "?contextId=${messageId}")
                                         },
-                                        navigateTo = { route ->
+                                        navigateTo = { route, tab ->
+                                            messagesViewModel.setSelectedMessage(route.substringAfter(
+                                                "mesId="
+                                            ),tab)
                                             if (currentRoute.contains("OneMessageScreen")) {
                                                 Log.i(TAG, "Get one mess from room")
                                                 oneMessagesViewModel.getOneMessageFromRoom(
-                                                    route.substringAfter(
-                                                        "mesId="
-                                                    )
+
                                                 )
+
+                                                 messagesList.find {
+                                                    it._did == route.substringAfter("mesId=")
+                                                }?.dMessage_sync = 0L
+
                                             } else {
                                                 Log.i(TAG, "Navigate with args")
                                                 navigateTo(route)

@@ -13,8 +13,8 @@ import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.AuthLoginDataState
 import com.arturlasok.webapp.feature_auth.model.AuthState
 import com.arturlasok.webapp.feature_auth.util.fireBaseErrors

@@ -1,4 +1,4 @@
-package com.arturlasok.webapp.feature_auth.data.repository
+package com.arturlasok.feature_core.data.repository
 
 import android.util.Log
 import com.arturlasok.feature_core.data.datasource.room.MessageDao
@@ -98,6 +98,8 @@ class RoomInteraction(val messageDao: MessageDao) {
             emit(false)
         }
     }
+    //count open tasks for badges
+    fun getCountNotViewedMessages(userMail :String) : Flow<Int> = messageDao.selectCountMessagesFlowNotViewedFromRoom(userMail)
     fun insertAllMessageToRoom(messages: List<Message>) : Flow<Boolean> = flow {
         try {
             val insert = messageDao.insertAllMessageToRoom(messageListFromDomainToEntity(messages))
@@ -132,10 +134,12 @@ class RoomInteraction(val messageDao: MessageDao) {
             emit(false)
         }
     }
-    fun updateOneMessageSetViewedByUserRoom(message: Message, viewedLong: Long) : Flow<Boolean> = flow {
+    fun updateOneMessageSetSync(messageId: String, viewedLong: Long) : Flow<Boolean> = flow {
         try {
-            val update = messageDao.updateOneMessageSetViewedByUserInRoom(viewedLong,message.dMessage_id ?: -1)
-            if(update>0) { emit(true) } else { emit(false) }
+            //val update =
+                messageDao.updateOneMessageSetViewedByUserInRoom(viewedLong,messageId)
+            //if(update>0) { emit(true) } else { emit(false) }
+            emit(true)
         }
         catch (e:Exception) {
             Log.i(TAG, "Room update viewed by user message exception: ${e.message}")

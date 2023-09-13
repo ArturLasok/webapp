@@ -2,17 +2,19 @@ package com.arturlasok.webapp.feature_auth.presentation.auth_profile
 
 import android.app.Application
 import android.util.Log
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arturlasok.feature_auth.R
+import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
-import com.arturlasok.webapp.feature_auth.data.repository.ApiInteraction
-import com.arturlasok.webapp.feature_auth.data.repository.RoomInteraction
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.ProfileDataState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
@@ -72,7 +74,7 @@ class ProfileViewModel @Inject constructor(
         profileDataState.value = profileDataState.value.copy(profileVerified = getIsVerified())
         //get profile info
         getProfileInfoFormKtor()
-
+        getAllMessagesFromKtor()
     }
 
     fun getServerTime() {
@@ -99,7 +101,14 @@ class ProfileViewModel @Inject constructor(
 
         }.launchIn(viewModelScope)
     }
-
+    fun setMobileToken(token: String) {
+        viewModelScope.launch{
+            dataStoreInteraction.setMobileToken(token)
+        }
+    }
+    fun getMobileTokenStore() : Flow<String> {
+        return dataStoreInteraction.getMobileToken()
+    }
     fun haveNetwork() : Boolean {
         return isOnline.isNetworkAvailable.value
     }
@@ -123,12 +132,36 @@ class ProfileViewModel @Inject constructor(
             Log.i(TAG, "Room all message delete $it")
         }.launchIn(viewModelScope)
     }
+    fun numberNotViewedMessages() : Flow<Int> =roomInteraction.getCountNotViewedMessages(getUserMail())
+    fun getAllMessagesFromKtor() {
+
+        roomInteraction.getAllMessagesIdsFromRoom().onEach { idList->
+
+            apiInteraction.ktor_getAllMessagesFromUser(getFireAuth().currentUser?.uid ?: "unknown",getUserMail(),idList).onEach { apiMessageList->
+                val readyList : MutableList<WebMessage> = mutableListOf()
+                apiMessageList.onEach {
+                    readyList.add(it.copy(_id = it._id.toString().substringAfter("oid=").substringBefore("}"),
+                        //add sync -1 if is new message for this user
+                        wMessage_sync = if(it.wMessage_viewedbyuser>0) 0 else -1))
+                }
+                //to rooom
+                roomInteraction.insertAllMessageToRoom(apiInteraction.messageListFromApiToDomain(readyList)).onEach {
+                    Log.i(TAG, "Room insert all messages response $it")
+
+                }.launchIn(viewModelScope).join()
+
+            }.launchIn(viewModelScope)
+
+        }.launchIn(viewModelScope)
+
+    }
     private fun getProfileInfoFormKtor() {
 
         apiInteraction.ktor_getUserData(
             key = getFireAuth().currentUser?.uid ?: "",
             mail = getFireAuth().currentUser?.email ?: "").onEach {
             if(it.webUserMail.isNotEmpty()) {
+
                 profileDataState.value= profileDataState.value.copy(
                     profileCountry = it.webSimCountry,
                     profileLang = it.webUserLang,

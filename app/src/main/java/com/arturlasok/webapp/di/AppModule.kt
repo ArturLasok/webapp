@@ -13,6 +13,7 @@ import com.arturlasok.feature_core.util.isOnline
 //import com.arturlasok.feature_core.util.Test
 //import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.webapp.BaseApplication
+import com.arturlasok.webapp.feature_auth.model.MessageListGlobalState
 //import com.arturlasok.feature_core.util.SavedStateHandlerInteraction
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
@@ -82,6 +83,11 @@ object AppModule {
     @Provides
     fun providesFireAuth(@ApplicationContext app: Context) : FirebaseAuth {
         return FirebaseAuth.getInstance()
+    }
+    @Singleton
+    @Provides
+    fun provideMessagesListGlobalState(dataStoreInteraction: DataStoreInteraction) : MessageListGlobalState {
+        return MessageListGlobalState(dataStoreInteraction)
     }
 
 }

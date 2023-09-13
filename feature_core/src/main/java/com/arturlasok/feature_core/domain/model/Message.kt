@@ -18,5 +18,6 @@ data class Message(
     val dMessage_user_lang:String = "",
     val dMessage_user_country:String = "",
     val dMessage_viewedbyuser:Long = 0L,
-    val dMessage_sync: Long = 0L,
-)
+    var dMessage_sync: Long = 0L,
+) : java.io.Serializable
+

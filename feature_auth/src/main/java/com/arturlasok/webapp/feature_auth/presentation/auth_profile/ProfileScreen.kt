@@ -37,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    notViewed:(number: Int) ->Unit,
     topBack: @Composable () -> Unit,
     topEnd: @Composable (fbAuth: FirebaseAuth) -> Unit,
     navigateTo: (route: String) -> Unit,
@@ -47,7 +48,8 @@ fun ProfileScreen(
     val snackbarController = SnackbarController(rememberCoroutineScope())
     val scaffoldState = rememberScaffoldState()
     val dataStoreDarkTheme = profileViewModel.darkFromStore().collectAsState(initial = 0)
-
+     notViewed(profileViewModel.numberNotViewedMessages().collectAsState(initial = 0).value)
+    val dataStoreMobileToken = profileViewModel.getMobileTokenStore().collectAsState(initial = "").value
     LaunchedEffect(key1 = true, block = {
         if(FirebaseAuth.getInstance().currentUser==null) {
             navigateTo(Screen.StartScreen.route)
@@ -141,16 +143,18 @@ fun ProfileScreen(
 
                               }, firebaseAuth = profileViewModel.getFireAuth())
 
-                    //TopLogOut(navigateTo = { route -> navigateTo(route) }, firebaseAuth = profileViewModel.getFireAuth() )
-                    //TopNetwork(isNetworkAvailable = profileViewModel.haveNetwork())
                 }
             }
         },
         bottomBar ={
+            /*
             Column {
                 Text("ProfileVer: "+profileViewModel.profileDataState.value.profileVerificationInteractionState.value.toString().substringAfter("$"))
                 Text("ProfileInfo:" +profileViewModel.profileDataState.value.profileInfoInteractionState.value.toString().substringAfter("$"))
-            }
+                Text("Mobile Token: ${dataStoreMobileToken}")
+             }
+             */
+
 
         }
     ) { paddingValues ->

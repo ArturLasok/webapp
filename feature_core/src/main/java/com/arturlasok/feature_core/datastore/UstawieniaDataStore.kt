@@ -16,5 +16,9 @@ class UstawieniaDataStore @Inject constructor(app: Application) {
 
     val FIRST_LOGIN = booleanPreferencesKey("first_login")
 
+    val SELECTED_MESSAGE = stringPreferencesKey("selected_message")
+
+    val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
+
 
 }
