@@ -26,14 +26,16 @@ fun DefaultSnackbar(
             Snackbar(
                 backgroundColor = if(data.message.substringBefore(">>>")=="error") { MaterialTheme.colors.error } else
                 {MaterialTheme.colors.primary},
-                modifier = Modifier.padding(start =4.dp,end = 4.dp,top = 4.dp, bottom = 4.dp),
+                modifier = Modifier.padding(start =14.dp,end = 14.dp,top = 4.dp, bottom = 4.dp),
                 content = {
                     Text(
                         text = data.message.substringAfter(">>>"),
                         style = MaterialTheme.typography.h4,
                         color = MaterialTheme.colors.onError,
-                        maxLines = 5
+                        maxLines = 5,
+                        modifier = Modifier.padding(bottom = 5.dp, top = 5.dp)
                     )
+
                 },
                 action = {
                     data.actionLabel?.let { actionLabel ->

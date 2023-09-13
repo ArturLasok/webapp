@@ -2,13 +2,31 @@
 <resources>
     <string name="auth_rememberQuestion">Remember my email and password</string>
     <string name="auth_dontRememberPassword">Forgot Password?</string>
+    <string name="auth_ok">OK</string>
+    <string name="auth_to">To: </string>
+    <string name="auth_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
+    <string name="auth_from">From: </string>
     <string name="auth_register">Don\'t have an account? Sign up</string>
     <string name="auth_registerShort">Sign up</string>
     <string name="auth_loginButton">Log In</string>
     <string name="auth_loginForm">Log In Form</string>
     <string name="auth_validEmailLike">A valid email like: address@example.com</string>
     <string name="auth_yourEmail">Your email</string>
+    <string name="auth_hideKeybord">Hide keyboard</string>
+    <string name="auth_send">Send</string>
+    <string name="auth_notopic">Add a message title</string>
+    <string name="auth_nomessageContent">Add message content</string>
+    <string name="auth_emptyMessageList">This tab does not contain messages</string>
+    <string name="auth_messageSent">Message sent</string>
+    <string name="auth_messageDelete">Message deleted</string>
+    <string name="auth_oneMessage_notExists">This message is not available. It has probably been deleted.</string>
+    <string name="auth_inbox">IN BOX</string>
+    <string name="auth_outbox">OUT BOX</string>
     <string name="auth_clear">Clear</string>
+    <string name="auth_verify">Check verification</string>
+    <string name="auth_verify_failed">Your account is still not verified. Click on the link received in the e-mail during registration or send the link again.</string>
+    <string name="auth_verifiednow">Your account has been verified. Thank you.</string>
+    <string name="auth_sendVerMail">Resend activation link</string>
     <string name="auth_validPassLike">Password must contain at least 10 characters</string>
     <string name="auth_yourPassword">Your password</string>
     <string name="auth_yourPasswordR">Repeat password</string>
@@ -30,8 +48,15 @@
     <string name="auth_email_form_error">The form contains errors. Please enter a valid email.</string>
     <string name="auth_fberror_nouser">There is no user with the given email address and password.</string>
     <string name="auth_fberror_inuse">The email address is already in use by another account.</string>
+    <string name="auth_resend_ver_mail">A verification link has been sent to your email address. Follow the instructions.</string>
     <string name="auth_fberror_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
+    <string name="auth_fberror_disabled">The user account has been disabled by an administrator</string>
+    <string name="auth_sendto">Send to:</string>
+    <string name="auth_message_content">Message:</string>
+    <string name="auth_message_topic">Title:</string>
+    <string name="auth_deleteMessage_question">Are you sure you want to delete message?</string>
     <string name="auth_fberror_invalidpass">The password is incorrect. If you have forgotten your password, click \"Forgot Password?\"</string>
     <string name="auth_fberror_blocked">Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.</string>
-
+    <string name="auth_afterreg_notregistered">Please confirm your registration by clicking on the link received in the e-mail. Confirmation of registration is necessary to take full advantage of the functionality of the application. Make sure that the messages do not end up in the spam folder in your inbox.</string>
+    <string name="auth_afterreg_info">Your account has been created. Please confirm your registration via the link in the email. Thanks for using the app.</string>
 </resources>

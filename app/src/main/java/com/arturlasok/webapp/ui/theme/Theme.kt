@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.SystemUiController
+import kotlinx.serialization.json.JsonNull.content
 
 
 private val DarkColorPalette = darkColors(
@@ -51,8 +52,8 @@ private val LightColorPalette = lightColors(
 )
 
 //gradient background for themes
-val lightBackgroundColorsList = listOf(Color(0xFF8865BB), Color(0xFFFFFFFF))
-val darkBackgroundColorList = listOf( Color(0xFF8865BB), Color(0xFF181414))
+val lightBackgroundColorsList = listOf(Color(0xFF8865BB), Color(0xFF8865BB))
+val darkBackgroundColorList = listOf( Color(0xFF2F1555), Color(0xFF181414))
 
 val lightGradient = Brush.verticalGradient(
     lightBackgroundColorsList
@@ -76,9 +77,10 @@ fun NavigationBarColor(is_dark: Boolean, systemUiController: SystemUiController)
 
 }
 @Composable
-fun BackgroundColor(is_dark: Boolean, setBackgroundGradient: (brush: Brush) -> Unit) {
+fun BackgroundColor(is_dark: Boolean, setBackgroundGradient: (brush: Brush) -> Unit, setBackgroundTopColor: (color: Color) -> Unit) {
 
-    if(is_dark) setBackgroundGradient(darkGradient) else setBackgroundGradient(lightGradient)
+    if(is_dark) { setBackgroundGradient(darkGradient); setBackgroundTopColor(darkBackgroundColorList[0]) }
+    else  { setBackgroundGradient(lightGradient); setBackgroundTopColor(lightBackgroundColorsList[0]) }
 
 }
 
@@ -86,6 +88,7 @@ fun BackgroundColor(is_dark: Boolean, setBackgroundGradient: (brush: Brush) -> U
 fun WebAppTheme(
     systemUiController: SystemUiController,
     setBackgroundGradient: (brush: Brush) -> Unit,
+    setBackgroundTopColor:(color:Color) -> Unit,
     darkTheme: Int = 0,
     content: @Composable () -> Unit) {
 
@@ -107,7 +110,12 @@ fun WebAppTheme(
 
         StatusBarColor(is_dark = isDark, systemUiController = systemUiController)
         NavigationBarColor(is_dark= isDark, systemUiController = systemUiController)
-        BackgroundColor(is_dark = isDark, setBackgroundGradient = { gradient-> setBackgroundGradient(gradient)})
+        BackgroundColor(
+            is_dark = isDark,
+            setBackgroundGradient = { gradient -> setBackgroundGradient(gradient)},
+            setBackgroundTopColor = { color -> setBackgroundTopColor(color)  }
+
+        )
 
     MaterialTheme(
         colors = colors,

@@ -61,7 +61,11 @@ dependencies {
     implementation(platform(Firebase.firebaseBom))
     implementation(Firebase.firebaseAnalytics)
     implementation(Firebase.firebaseAuth)
-
+    //Ktor
+    implementation(Ktor.ktorClient)
+    implementation(Ktor.ktorNegotiation)
+    implementation(Ktor.ktorJson)
+    implementation(Ktor.ktorSerialization)
     //vm lifecycle
    // implementation(AndroidX.lifeCyc)
    // implementation(AndroidX.lifeCycVm)

@@ -61,4 +61,36 @@ class DataStoreInteraction @Inject constructor(
             pref[FIRST_LOGIN] = value
         }
     }
+    //Selected message
+    fun getSelectedMessage() : Flow<String> {
+        //Data Store mail follow // "" - default
+        val SELECTED_MESSAGE = stringPreferencesKey("selected_message")
+        val dataFromStore : Flow<String> =  dataStore.data.map { pref->
+            pref[SELECTED_MESSAGE] ?: ""
+        }
+
+        return dataFromStore
+    }
+    suspend fun setSelectedMessage(value: String) {
+        val SELECTED_MESSAGE = stringPreferencesKey("selected_message")
+        dataStore.edit { pref ->
+            pref[SELECTED_MESSAGE] = value
+        }
+    }
+    //token
+    fun getMobileToken() : Flow<String> {
+        //Data Store mail follow // "" - default
+        val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
+        val dataFromStore : Flow<String> =  dataStore.data.map { pref->
+            pref[MOBILE_TOKEN] ?: ""
+        }
+
+        return dataFromStore
+    }
+    suspend fun setMobileToken(value: String) {
+        val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
+        dataStore.edit { pref ->
+            pref[MOBILE_TOKEN] = value
+        }
+    }
 }

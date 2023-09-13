@@ -1,11 +1,10 @@
 package com.arturlasok.webapp.feature_auth.presentation.auth_login
 
 import android.app.Application
+import android.content.Context
+import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,18 +13,19 @@ import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
+import com.arturlasok.feature_core.data.repository.ApiInteraction
+import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.webapp.feature_auth.model.AuthLoginDataState
 import com.arturlasok.webapp.feature_auth.model.AuthState
 import com.arturlasok.webapp.feature_auth.util.fireBaseErrors
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -36,6 +36,8 @@ class LoginViewModel @Inject constructor(
     private val isOnline: isOnline,
     private val fireAuth: FirebaseAuth,
     private val dataStoreInteraction: DataStoreInteraction,
+    private val apiInteraction: ApiInteraction,
+    private val roomInteraction: RoomInteraction
 ) : ViewModel() {
 
     private val authLogin = savedStateHandle.getStateFlow("authLogin","")
@@ -99,6 +101,15 @@ class LoginViewModel @Inject constructor(
     fun getFireAuth() : FirebaseAuth {
         return fireAuth
     }
+    private fun setMobileTokenInDataStore(token: String) {
+        Log.i(TAG, "4. SET MOBILE TOKEN IN DATASTORE -> LOGIN VIEW MODEL")
+        viewModelScope.launch{
+            dataStoreInteraction.setMobileToken(token)
+        }
+    }
+    fun getMobileTokenStore() : Flow<String> {
+        return dataStoreInteraction.getMobileToken()
+    }
     fun ifFormIsOk() : Boolean {
         val EMAIL_ADDRESS_PATTERN = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
@@ -115,15 +126,78 @@ class LoginViewModel @Inject constructor(
         }
         return isValidEmailString(authLoginDataState.value.authLogin) && authLoginDataState.value.authPassword.length>9
     }
-    fun login() {
+    fun dbSyncInsertOrUpdateUser() {
+        if (getFireAuth().currentUser != null) {
+            Log.i(TAG, "1. INSERT MOBILE TOKEN TO KTOR IN DBSYNC")
+            getFireAuth().currentUser?.let { ktorInsertOrUpdateUser(it) }
+        } else {
+            authState.value = AuthState.AuthError(
+                UiText.StringResource(R.string.auth_somethingWrong, "asd")
+                    .asString(applicationContext)
+            )
+            getFireAuth().signOut()
 
+        }
+    }
+    private fun ktorInsertOrUpdateUser(user: FirebaseUser) {
+        try {
+            val sim = application.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val tmr = sim.networkCountryIso
+            val unixTime = System.currentTimeMillis() / 1000L
+            val allowedChars = ('A'..'Z') + ('a'..'s') + ('0'..'9')
+            val genTokenForThisMobile: () -> String = fun() : String {
+                return (1..16)
+                    .map { allowedChars.random() }
+                    .joinToString("")
+            }
+            val token =  unixTime.toString()+"time"+genTokenForThisMobile.invoke()
+            Log.i(TAG, "2. MOBILE TOKEN GENERATING")
+            apiInteraction.ktor_insertOrUpdateUser(
+                token = token,
+                key = user.uid,
+                mail = user.email ?: "null",
+                simCountry = tmr
+            ).onEach { response ->
+                if (response) {
+                    setMobileTokenInDataStore(token)
+                    if (user.isEmailVerified) {
+                        apiInteraction.ktor_updateUserVerificationToTrue(
+                            user.uid,
+                            user.email ?: "null"
+                        ).onEach {
+
+                        }.launchIn(viewModelScope).join()
+                    }
+                    authState.value = AuthState.Success
+
+
+                } else {
+                    authState.value = AuthState.AuthError(
+                        UiText.StringResource(
+                            R.string.auth_somethingWrong,
+                            "asd"
+                        ).asString(applicationContext)
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+        } catch (e: Exception) {
+            authState.value = AuthState.AuthError(
+                UiText.StringResource(
+                    R.string.auth_somethingWrong,
+                    "asd"
+                ).asString(applicationContext)
+            )
+        }
+    }
+    fun login() {
         if(ifFormIsOk()) {
             fireAuth.signInWithEmailAndPassword(
                 authLoginDataState.value.authLogin,
                 authLoginDataState.value.authPassword
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    authState.value = AuthState.Success
+                    authState.value = AuthState.DbSync
                     setMailFollowInDataStore(authLoginDataState.value.authLogin)
                 } else {
                     task.exception?.let {

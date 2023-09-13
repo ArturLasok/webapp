@@ -3,6 +3,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin(KotlinPlugins.serialization) version Kotlin.version
     id("com.google.gms.google-services")
@@ -34,6 +35,8 @@ android {
     }
     buildTypes {
         getByName("release") {
+            buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
+            buildConfigField("String","APPURL","\"web\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,6 +44,8 @@ android {
             )
         }
         getByName("debug") {
+            buildConfigField("String","BASEAPIURL","\"http://server873539.nazwa.pl\"")
+            buildConfigField("String","APPURL","\"web\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -94,16 +99,20 @@ dependencies {
     implementation(AndroidX.hiltNav)
     implementation(Hilt.hiltAndroid)
     kapt(Hilt.hiltKapt)
-    //CoreKtx
-   // implementation(AndroidX.coreKtx)
+    //Ktor
+    implementation(Ktor.ktorClient)
+    implementation(Ktor.ktorNegotiation)
+    implementation(Ktor.ktorJson)
+    implementation(Ktor.ktorAndroid)
     //Firebase
     implementation(platform(Firebase.firebaseBom))
     implementation(Firebase.firebaseAnalytics)
     implementation(Firebase.firebaseAuth)
-    //vm lifecycle
-   // implementation(AndroidX.lifeCyc)
-    //implementation(AndroidX.lifeCycVm)
-    //implementation(AndroidX.lifektx)
+    //Room
+    implementation(Room.roomRuntime)
+    annotationProcessor(Room.roomAnnotationProcessor)
+    ksp(Room.roomKotlinSymbolProcessing)
+    implementation(Room.roomKtx)
 
     //Test
 /*
