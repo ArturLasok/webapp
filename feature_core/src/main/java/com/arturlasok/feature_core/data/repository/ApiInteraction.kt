@@ -5,7 +5,9 @@ import android.os.Build
 import android.util.Log
 import androidx.compose.ui.text.intl.Locale
 import com.arturlasok.feature_core.BuildConfig
+import com.arturlasok.feature_core.data.datasource.api.model.WebDomains
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
+import com.arturlasok.feature_core.data.datasource.api.model.WebProject
 import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.data.datasource.api.model.WebUser
@@ -79,6 +81,57 @@ class ApiInteraction(
     fun getServerTime() : Flow<String> = flow {
         emit(ktorClient.get("$baseLink/servertime-plu").bodyAsText())
     }
+
+    //get domains from ktor
+    fun ktor_getDomainsData(host:String) : Flow<Triple<List<WebDomains>,List<WebDomains>,String>> = flow  {
+
+        try {
+            Log.i(TAG, "KTOR CHIP HOST: ${host}")
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getdomains") {
+                    contentType(ContentType.Text.Plain)
+                    setBody(host)
+                }
+
+            val listType = object : TypeToken<List<List<WebDomains>>>() {}.type
+
+            val data = Gson().fromJson<List<List<WebDomains>>>(response.bodyAsText(),listType)
+
+            Log.i(TAG, "KTOR get domains resp: ${response.status} bat: ${response.bodyAsText()} ${data[0].size} // ${data[1].size} // ${data[2].size} // ${data[2][0].wDomain_address}")
+            emit(Triple(data[0],data[1],data[2][0].wDomain_address))
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get domains data exception: ${e.message}")
+            //do nothing
+            emit(Triple(listOf(), listOf(),"FALSE!"))
+        }
+    }
+    //Get Projects from ktor
+    fun ktor_getUserProjects(
+        key:String,
+        mail: String
+    ) : Flow<List<WebProject>> = flow  {
+        Log.i(TAG, "KTOR get user project mail: $mail , key: $key")
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getuserprojects") {
+                    contentType(ContentType.Application.Json)
+                    setBody(Pair(mail,key))
+                }
+            val listType = object : TypeToken<List<WebProject>>() {}.type
+
+            val json = Gson().fromJson<List<WebProject>>(response.bodyAsText(),listType)
+
+            Log.i(TAG, "KTOR get projects resp: ${response.status} js ${json.size}")
+            //if(response.status.value==302) { emit(true) } else { emit(false) }
+            emit(json)
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get user projects exception: ${e.message}")
+            //do nothing
+            emit(listOf(WebProject(wProject_sync = -1L)))
+        }
+    }
     //Get User from ktor
     fun ktor_getUserData(
         key:String,
@@ -148,6 +201,48 @@ class ApiInteraction(
             emit(false)
         }
 
+    }
+    //Insert project to ktor
+    fun ktor_insertProject(
+        projectName : String,
+        projectAddress: String,
+        projectDomain:String,
+        token: String = "",
+        key: String,
+        mail:String,
+        simCountry:String,
+    ) : Flow<Boolean> = flow {
+        try {
+
+
+            val lang = Locale.current.region
+            val model = Build.MODEL
+            //ktor insert
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_addwebproject") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        WebProject(
+                            wProject_title = projectName,
+                            wProject_address = "$projectAddress.$projectDomain",
+                            wProject_mail = mail,
+                            wProject_token = key,
+                            wProject_enabled = true,
+                            wProject_lang = lang,
+                            wProject_country = simCountry.uppercase(),
+                            wProject_added = System.currentTimeMillis(),
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR insert project: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR insert/update user exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
     }
     //Insert and update user on login or on registration
     fun ktor_insertOrUpdateUser(

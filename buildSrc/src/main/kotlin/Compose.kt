@@ -1,12 +1,12 @@
 object Compose {
 
-    const val composeKotlinCompilerVersion = "1.3.0"
+    const val composeKotlinCompilerVersion = "1.4.0"
 
     private const val activityComposeVersion = "1.5.1"
 
     const val activityCompose = "androidx.activity:activity-compose:$activityComposeVersion"
 
-    private const val composeVersion = "1.2.1"
+    private const val composeVersion = "1.4.0"
 
     const val composeUi = "androidx.compose.ui:ui:$composeVersion"
     const val composeUiTooling = "androidx.compose.ui:ui-tooling:$composeVersion"

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="creator_projectNameLabel">Project Name</string>
+    <string name="creator_prjectNameLabelError">Not Valid Name</string>
+    <string name="creator_projectAddressLabel">www subdomain address</string>
+    <string name="creator_prjectAddressLabelError">not accepted address</string>
+    <string name="creator_addProject">Submit and create project</string>
+    <string name="core_policy">By submits you agree to the Terms of Service and Privacy Policy</string>
+    <string name="core_insert_form_error_domain">Select an available domain for the website.</string>
+    <string name="core_insert_form_error_address">Enter the correct address in the form.</string>
+    <string name="core_insert_apierror">The project cannot be added at this time. Please try again in a moment.</string>
+    <string name="core_insert_create">Your project has been created.</string>
+    <string name="creator_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
+    <string name="creator_detailsOfProject">"Details of your project"</string>
+    <string name="creator_addProjectInfo">Enter the address for your website and select one of the available domains.</string>
+    <string name="creator_addCompleteAddress">Your project complete address looks now like this:</string>
+    <string name="creator_domainAreRegistered">Selected domain and address is registered by other user</string>
+    <string name="creator_domainSelectOne">Select one of the available domain\'s"</string>
+    <string name="creator_domainsCheck">I\'m checking is domain are free</string>
+    <string name="creator_refresh">Refresh form</string>
+    <string name="creator_share">Share</string>
+    <string name="creator_copy">Copy</string>
+    <string name="creator_next_step">Login or sign up</string>
+    <string name="creator_done">Done! It went fast.</string>
+    <string name="creator_successInfo">Your website was created. You can check it in web browser by clicking address on row below:</string>
+    <string name="creator_successInfoTwo">Now is time to add details to your website. Add title, logo, menus, icons, forms and a lot more features are available to you. To continue working on the project, you must sign up or log in. All projects from this device will be linked to your account once you log in or sign up.</string>
+    <string name="creator_copyLink">Copy link</string>
+</resources>

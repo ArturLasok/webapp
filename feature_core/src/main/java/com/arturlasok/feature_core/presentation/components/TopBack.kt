@@ -37,7 +37,7 @@ fun TopBack(
     onHome:() ->Unit) {
 
     if (isHome) {
-        Text(text="Home", color = MaterialTheme.colors.onSurface)
+        Text(text=UiText.StringResource(R.string.core_home, "asd").asString(),modifier = Modifier.padding(start=6.dp), color = MaterialTheme.colors.onSurface)
     } else {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if(!isSecondScreen) {

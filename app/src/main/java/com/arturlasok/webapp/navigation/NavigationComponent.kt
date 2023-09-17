@@ -5,8 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +22,7 @@ import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_creator.presentation.creator_addproject.AddProjectScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_addmessage.AddMessageScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
@@ -91,6 +90,7 @@ fun NavigationComponent(
                 navHostController.backQueue.removeAll { nbe->
                     nbe.destination.route?.contains("StartScreen") == false
                 }
+                navHostController.currentBackStackEntry?.arguments?.clear()
             }
 
             Column() {
@@ -537,6 +537,23 @@ fun NavigationComponent(
             }
 
 
+        }
+        // Add Project Screen
+        composable(
+            route= Screen.AddProjectScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                    AddProjectScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.AddProjectScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                    )
+
+            }
         }
     }
 }

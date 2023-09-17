@@ -19,3 +19,4 @@ rootProject.name = "WebApp"
 include ':app'
 include ':feature_core'
 include ':feature_auth'
+include ':feature_creator'

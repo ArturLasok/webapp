@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="core_user">User</string>
+    <string name="core_home">Hello!</string>
+    <string name="core_nonetwork">No connection to the server. Check the network connection. Try it in a moment.</string>
+    <string name="core_somethingWrong">Something went wrong. Please try later.</string>
     <string name="core_navBack">Navigate Up</string>
     <string name="core_networkNotAvailable">No internet connection</string>
     <string name="core_networkAvailable">Network available</string>
@@ -20,8 +23,12 @@
     <string name="Screen_OneMessages">Message View</string>
     <string name="Screen_Forgot">Forgot password?</string>
     <string name="Screen_Profile">Profile</string>
+    <string name="Screen_AddProject">Add Project</string>
     <string name="core_yes">Yes</string>
     <string name="core_no">No</string>
     <string name="core_logout_question">Are you sure you want to log out now?</string>
     <string name="core_ok">OK</string>
+    <string name="core_clear">Clear</string>
+    <string name="core_refresh">Refresh</string>
+    <string name="core_trytoconnect">Try to connect</string>
 </resources>

@@ -93,7 +93,7 @@ val Dark_primary_variant = Color(0xFF35271E)
 val Dark_secondary = Color(0xFF000000)
 val Dark_on_secondary = Color(0xFFE7E7E7)
 
-val Dark_background = Color(0xFF1B1616)
+val Dark_background = Color(0xFF1E1F2E)
 val Dark_on_background = Color(0xFFCBCCD6)
 
 val Dark_surface = Color(0xFF8865BB)

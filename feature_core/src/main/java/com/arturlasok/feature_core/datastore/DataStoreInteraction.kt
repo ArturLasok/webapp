@@ -77,7 +77,7 @@ class DataStoreInteraction @Inject constructor(
             pref[SELECTED_MESSAGE] = value
         }
     }
-    //token
+    //mobile token
     fun getMobileToken() : Flow<String> {
         //Data Store mail follow // "" - default
         val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
@@ -91,6 +91,22 @@ class DataStoreInteraction @Inject constructor(
         val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
         dataStore.edit { pref ->
             pref[MOBILE_TOKEN] = value
+        }
+    }
+    //temporary project token
+    fun getProjectTemporaryToken() : Flow<String> {
+        //Data Store mail follow // "" - default
+        val TEMPORARY_PROJECTS_TOKEN = stringPreferencesKey("temporary_project_token")
+        val dataFromStore : Flow<String> =  dataStore.data.map { pref->
+            pref[TEMPORARY_PROJECTS_TOKEN] ?: ""
+        }
+
+        return dataFromStore
+    }
+    suspend fun setProjectTemporaryToken(value: String) {
+        val TEMPORARY_PROJECTS_TOKEN = stringPreferencesKey("temporary_project_token")
+        dataStore.edit { pref ->
+            pref[TEMPORARY_PROJECTS_TOKEN] = value
         }
     }
 }

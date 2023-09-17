@@ -24,6 +24,8 @@ sealed class  Screen(val route:String, val routeWithArgs:String,val arguments: L
 
     object OneMessageScreen:Screen("OneMessageScreen?mesId={mesId}","OneMessageScreen", emptyList(),R.string.Screen_OneMessages)
 
+    object AddProjectScreen:Screen("AddProjectScreen","AddProjectScreen", emptyList(),R.string.Screen_AddProject)
+
 
 }
 

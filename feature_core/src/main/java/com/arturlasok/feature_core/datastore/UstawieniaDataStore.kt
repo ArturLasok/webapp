@@ -20,5 +20,7 @@ class UstawieniaDataStore @Inject constructor(app: Application) {
 
     val MOBILE_TOKEN = stringPreferencesKey("mobile_token")
 
+    val TEMPORARY_PROJECTS_TOKEN = stringPreferencesKey("temporary_project_token")
+
 
 }

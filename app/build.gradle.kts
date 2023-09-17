@@ -80,6 +80,7 @@ dependencies {
     //Modules to :app
     implementation(project(Modules.feature_core))
     implementation(project(Modules.feature_auth))
+    implementation(project(Modules.feature_creator))
     //Compose
     implementation(Compose.composeUi)
     implementation(Compose.composeUiTooling)
