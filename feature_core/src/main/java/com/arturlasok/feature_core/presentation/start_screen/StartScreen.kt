@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -23,7 +25,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -38,24 +39,23 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_core.R
+import com.arturlasok.feature_core.data.datasource.api.model.WebProject
 import com.arturlasok.feature_core.domain.model.StartProjectsInteractionState
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
 import com.arturlasok.feature_core.presentation.components.TopAuth
 import com.arturlasok.feature_core.presentation.components.TopBack
 import com.arturlasok.feature_core.presentation.components.TopSettings
-import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.UiText
-import com.arturlasok.feature_core.util.snackMessage
 import kotlinx.coroutines.delay
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StartScreen(
     startViewModel: StartViewModel = hiltViewModel(),
@@ -96,7 +96,7 @@ fun StartScreen(
             }
         },
         bottomBar ={
-           // Text(text="${startViewModel.allProjects.second.value}")
+            //Text(text="${startViewModel.allProjects.second.value} // size: ${startViewModel.allProjects.first.value.size}")
         }
     ) { paddingValues ->
         //content
@@ -115,8 +115,24 @@ fun StartScreen(
             when(startViewModel.allProjects.second.value) {
 
                 is StartProjectsInteractionState.OnComplete -> {
-                    startViewModel.allProjects.first.value.onEach { project ->
-                        Text("Project: ${project.wProject_address} \n")
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        startViewModel.allProjects.first.value.onEach { project ->
+
+                            OneProjectButton(
+                                navigateTo = { route -> navigateTo(route) },
+                                navigateUp = { navigateUp() },
+                                project = project,
+                            )
+                        }
+                        //add next project
+                        OneProjectButton(
+                            navigateTo = { route -> navigateTo(route) },
+                            navigateUp = { navigateUp() },
+                            project = WebProject(),
+                        )
                     }
 
                 }
@@ -224,8 +240,8 @@ fun StartScreen(
                             ),
                             modifier = Modifier
                                 .size(
-                                    256.dp,
-                                    256.dp
+                                    216.dp,
+                                    216.dp
                                 )
                                 .padding(bottom = 2.dp)
                                 .alpha(0.9f),

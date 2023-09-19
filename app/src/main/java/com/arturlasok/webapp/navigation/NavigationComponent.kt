@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -66,9 +68,12 @@ fun NavigationComponent(
 
         })
         //NAV Queue
-        //Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
-        //   it.destination.route.toString()
-        //}} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
+        /*
+        Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
+           it.destination.route.toString()
+        }} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
+
+         */
     }
 
     NavHost(
@@ -82,7 +87,7 @@ fun NavigationComponent(
         composable(
             route= Screen.StartScreen.route,
             arguments = listOf(navArgument("logOut") { defaultValue = "logOut"},navArgument("email") { defaultValue = "email"})
-        ) {
+        ) { it ->
 
             //if arg logOut==true remove ProfileScreen from backQueue
             if(it.arguments?.getString("logOut") =="true") {
@@ -91,6 +96,13 @@ fun NavigationComponent(
                     nbe.destination.route?.contains("StartScreen") == false
                 }
                 navHostController.currentBackStackEntry?.arguments?.clear()
+                navHostController.backQueue.onEach { bce ->
+                    bce.getViewModelStore().clear()
+                }
+
+
+
+
             }
 
             Column() {
@@ -288,7 +300,7 @@ fun NavigationComponent(
                                     "asd"
                                 ).asString(),
                                 onBack = { navHostController.popBackStack() })
-                            { navHostController.navigate(Screen.StartScreen.route) }
+                            { navHostController.navigate(Screen.StartScreen.route)  }
                         },
                         topEnd = { fbAuth ->
                             TopMessages(navigateTo = {route -> navHostController.navigate(route = route)  },notViewed.value)

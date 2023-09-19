@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +30,6 @@ import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
-import com.google.android.play.core.integrity.p
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -197,7 +195,12 @@ fun ProfileScreen(
                     verificationMailButtonVisible = profileViewModel.verificationMailButtonVisible,
                     verificationCheckButtonEnabled = profileViewModel.verificationCheckButtonEnabled.value,
                 )
-
+                ProfileProjectsView(
+                    navigateTo = { route -> navigateTo(route) },
+                    navigateUp = {  },
+                    profileViewModel.allProjects,
+                    profileViewModel.haveNetwork(),
+                )
 
             }
         }

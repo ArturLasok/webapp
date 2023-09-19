@@ -436,11 +436,6 @@ fun AddProjectScreen(
                                             textPadding = 30.dp,
                                             buttonAction = {
                                                 keyboardController?.hide(); focusManager.clearFocus(true)
-                                               // addProjectViewModel.setNewProjectInsertState(ProjectInteractionState.IsSuccessful())
-                                                //todo move to vm after add
-
-                                                //addProjectViewModel.setNewProjectInsertState(ProjectInteractionState.OnComplete)
-
                                                 addProjectViewModel.setNewProjectInsertState(
                                                     ProjectInteractionState.Interact
                                                 )

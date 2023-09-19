@@ -135,7 +135,15 @@ class RegViewModel @Inject constructor(
     }
     fun dbSyncInsertOrUpdateUser() {
         if (getFireAuth().currentUser != null) {
-            getFireAuth().currentUser?.let { ktorInsertOrUpdateUser(it) }
+            getFireAuth().currentUser?.let {
+
+
+
+
+                ktorInsertOrUpdateUser(it)
+
+
+            }
         } else {
             authState.value = AuthState.AuthError(
                 UiText.StringResource(R.string.auth_somethingWrong, "asd")
@@ -145,12 +153,28 @@ class RegViewModel @Inject constructor(
 
         }
     }
+    private fun setMobileTokenInDataStore(token: String) {
+        viewModelScope.launch{
+            dataStoreInteraction.setMobileToken(token)
+        }
+    }
     private fun ktorInsertOrUpdateUser(user: FirebaseUser) {
         try {
             val sim = application.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             val tmr = sim.networkCountryIso
-        apiInteraction.ktor_insertOrUpdateUser(key = user.uid, mail = user.email ?: "null", simCountry = tmr).onEach { response->
+            val unixTime = System.currentTimeMillis() / 1000L
+            val allowedChars = ('A'..'Z') + ('a'..'s') + ('0'..'9')
+            val genTokenForThisMobile: () -> String = fun() : String {
+                return (1..16)
+                    .map { allowedChars.random() }
+                    .joinToString("")
+            }
+            val token =  unixTime.toString()+"time"+genTokenForThisMobile.invoke()
+
+
+        apiInteraction.ktor_insertOrUpdateUser(key = user.uid, mail = user.email ?: "null", simCountry = tmr, token = token).onEach { response->
             if(response) {
+                setMobileTokenInDataStore(token)
                 authState.value = AuthState.Success
             }
             else {

@@ -180,6 +180,29 @@ class ApiInteraction(
             emit(WebUser())
         }
     }
+    //
+    fun ktor_updateOpenProjects(
+        mail: String,
+        key:String,
+        tempToken:String,
+    ) : Flow<Boolean> = flow {
+
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_updateopenprojects") {
+                    contentType(ContentType.Application.Json)
+                    setBody(Triple(mail,key,tempToken))
+                }
+            Log.i(TAG, "KTOR update verification user response: ${response.status}")
+            if(response.status.value==302) { emit(true) } else { emit(false) }
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR update verification user exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+
+    }
     //Update user verification to true
     fun ktor_updateUserVerificationToTrue(
         key:String,

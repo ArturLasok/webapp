@@ -59,6 +59,7 @@ fun AddMessageForm(
     setNewMessage:(message:String) ->Unit,
     setNewMessageTopic: (messageTopic: String) -> Unit,
     setNewMessageContext:(mContext:String)->Unit,
+    setNewMessageTo:(to:String)->Unit,
     sendClick:() -> Unit,
     darkTheme: Int,
     fbAuth: FirebaseAuth,
@@ -156,7 +157,7 @@ fun AddMessageForm(
                 {
                     //To filed
                     OutlinedTextField(
-                        enabled = false,
+                        enabled = fbAuth.currentUser?.email == "artpl81@gmail.com",
                         modifier = Modifier
                             .padding(start = 24.dp, end = 12.dp)
                             .fillMaxWidth(0.6f),
@@ -167,6 +168,7 @@ fun AddMessageForm(
                         value = toField.value,
                         onValueChange = { newInput ->
                            toField.value =  newInput
+                            setNewMessageTo(newInput.text)
                         },
                         shape = MaterialTheme.shapes.large,
                         singleLine = true,

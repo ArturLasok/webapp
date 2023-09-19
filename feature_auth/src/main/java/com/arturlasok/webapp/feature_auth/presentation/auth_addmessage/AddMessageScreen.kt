@@ -137,6 +137,7 @@ fun AddMessageScreen(
                     setNewMessage = { message -> addMessageViewModel.setNewMessageText(message) },
                     setNewMessageTopic = { messageTopic -> addMessageViewModel.setNewMessageTopic(messageTopic)  },
                     setNewMessageContext = { mContext ->  addMessageViewModel.setNewMessageContext(mContext) },
+                    setNewMessageTo = { to-> addMessageViewModel.setNewMessageTo(to) },
                     darkTheme = dataStoreDarkTheme.value,
                     fbAuth = addMessageViewModel.getFireAuth(),
                     newMessageDataState = addMessageViewModel.newMessageDataState.value,

@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arturlasok.feature_auth.R
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
+import com.arturlasok.feature_core.data.datasource.api.model.WebProject
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.feature_core.data.repository.ApiInteraction
 import com.arturlasok.feature_core.data.repository.RoomInteraction
+import com.arturlasok.feature_core.domain.model.StartProjectsInteractionState
 import com.arturlasok.webapp.feature_auth.model.ProfileDataState
 import com.arturlasok.webapp.feature_auth.model.ProfileInteractionState
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +48,9 @@ class ProfileViewModel @Inject constructor(
     private val profileMail = savedStateHandle.getStateFlow("profileMail","")
     private val profileVerified = savedStateHandle.getStateFlow("profileVerified",false)
     private val profileFirstLogin = savedStateHandle.getStateFlow("profileFirstLogin",true)
+
+    var allProjects = Pair(mutableStateOf(listOf<WebProject>()), mutableStateOf<StartProjectsInteractionState>(
+        StartProjectsInteractionState.Idle))
 
     val applicationContext = application
 
@@ -75,6 +81,7 @@ class ProfileViewModel @Inject constructor(
         //get profile info
         getProfileInfoFormKtor()
         getAllMessagesFromKtor()
+        updateOpenProjects()
     }
 
     fun getServerTime() {
@@ -84,6 +91,67 @@ class ProfileViewModel @Inject constructor(
                 serverTime.value = it
 
             }.launchIn(viewModelScope)
+
+    }
+    fun getAllProjectsFromKtor() {
+        allProjects.second.value = StartProjectsInteractionState.Interact
+        getProjectTemporaryTokenStore().take(1).onEach { tempToken ->
+
+
+            //check user or temp user
+            val mail = if(getFireAuth().currentUser!=null) {
+                getFireAuth().currentUser?.email } else { tempToken }
+
+            val key = if(getFireAuth().currentUser!=null) {
+                getFireAuth().currentUser?.uid } else { tempToken }
+
+
+            apiInteraction.ktor_getUserProjects(key ?: "",mail ?: "").onEach { projectsList->
+
+                allProjects.first.value = projectsList
+                if(allProjects.first.value.isEmpty()) {
+
+                    allProjects.second.value = StartProjectsInteractionState.Empty
+
+                }
+                else {
+                    if (projectsList[0].wProject_sync == -1L) {
+                        allProjects.second.value = StartProjectsInteractionState.Error(message = UiText.StringResource(
+                            com.arturlasok.feature_core.R.string.core_somethingWrong,
+                            "asd"
+                        ).asString(application.applicationContext))
+                    } else{
+                        allProjects.second.value = StartProjectsInteractionState.OnComplete
+                    }
+
+
+                }
+
+            }.launchIn(viewModelScope)
+
+        }.launchIn(viewModelScope)
+
+    }
+    fun getProjectTemporaryTokenStore() : Flow<String> {
+        return dataStoreInteraction.getProjectTemporaryToken()
+    }
+    fun updateOpenProjects() {
+        getProjectTemporaryTokenStore().take(1).onEach { tempToken ->
+
+            apiInteraction.ktor_updateOpenProjects(
+                mail = getUserMail(),
+                key = getFireAuth().currentUser?.uid ?: "",
+                tempToken = tempToken).onEach {
+
+                Log.i(TAG,"Temp project are updated in ktor  $it")
+                getAllProjectsFromKtor()
+
+
+            }.launchIn(viewModelScope).join()
+
+
+
+        }.launchIn(viewModelScope)
 
     }
     fun darkFromStore() : Flow<Int> {
