@@ -22,5 +22,7 @@ class UstawieniaDataStore @Inject constructor(app: Application) {
 
     val TEMPORARY_PROJECTS_TOKEN = stringPreferencesKey("temporary_project_token")
 
+    val OPEN_PROJECT = stringPreferencesKey("open_project")
+
 
 }

@@ -40,6 +40,7 @@ class MainViewModel @Inject constructor(
 
 
     val mainUserMobileCheckState: MutableState<UserMobileCheckState> = mutableStateOf(UserMobileCheckState.Idle)
+
     fun getMobileTokenStore() : Flow<String> {
         return dataStoreInteraction.getMobileToken()
     }

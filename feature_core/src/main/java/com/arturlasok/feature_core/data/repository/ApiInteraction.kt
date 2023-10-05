@@ -6,11 +6,12 @@ import android.util.Log
 import androidx.compose.ui.text.intl.Locale
 import com.arturlasok.feature_core.BuildConfig
 import com.arturlasok.feature_core.data.datasource.api.model.WebDomains
+import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.data.datasource.api.model.WebProject
+import com.arturlasok.feature_core.data.datasource.api.model.WebUser
 import com.arturlasok.feature_core.domain.model.Message
 import com.arturlasok.feature_core.util.TAG
-import com.arturlasok.feature_core.data.datasource.api.model.WebUser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.client.HttpClient
@@ -22,9 +23,11 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import org.bson.codecs.kotlinx.BsonEncoder
+import org.bson.types.ObjectId
 
 
 class ApiInteraction(
@@ -224,6 +227,190 @@ class ApiInteraction(
             emit(false)
         }
 
+    }
+    //Get all project layouts
+    fun ktor_getAllWebLayoutsFromProject(
+        key:String,
+        mail: String,
+        projectId:String,
+    ) : Flow<Pair<Boolean,List<WebLayout>>> = flow  {
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getallprojectlayouts") {
+                    contentType(ContentType.Application.Json)
+                    setBody(Triple(key, mail, projectId))
+                }
+            Log.i(TAG, "KTOR layout response body: ${response.bodyAsText()}")
+
+            val listType = object : TypeToken<List<WebLayout>>() {}.type
+            val data = Gson().fromJson<List<WebLayout>>(response.bodyAsText(),listType)
+            //val data = Json.decodeFromString<List<WebLayout>>(response.bodyAsText())
+            //val data =  response.body<List<WebLayout>>()
+
+            Log.i(TAG, "KTOR get layouts resp: ${response.status}")
+            Log.i(TAG, "KTOR get layouts resp data after take: ${data}")
+            if(response.status.value==200) { emit(Pair(true,data)) } else { emit(Pair(false,listOf())) }
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get layouts exception: ${e.message} ${e.localizedMessage} ${e.cause}")
+            //do nothing
+            emit(Pair(false,listOf<WebLayout>()))
+        }
+    }
+    //Get one project layouts
+    fun ktor_getOneWebLayouts(
+        key:String,
+        mail: String,
+        id:String,
+    ) : Flow<WebLayout> = flow  {
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getonelayout") {
+                    contentType(ContentType.Application.Json)
+                    setBody(Triple(key, mail, id.substringAfter("oid=").substringBefore("}")))
+                }
+            Log.i(TAG, "KTOR one layout response body: ${response.bodyAsText()}")
+
+            val listType = object : TypeToken<WebLayout>() {}.type
+            val data = Gson().fromJson<WebLayout>(response.bodyAsText(),listType)
+            //val data = Json.decodeFromString<List<WebLayout>>(response.bodyAsText())
+            //val data =  response.body<List<WebLayout>>()
+
+            Log.i(TAG, "KTOR get one layout resp: ${response.status}")
+            Log.i(TAG, "KTOR get one layout resp data after take: ${data}")
+            if(response.status.value==200) { emit(data) } else { emit(WebLayout()) }
+        }
+        catch (e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get layouts exception: ${e.message} ${e.localizedMessage} ${e.cause}")
+            //do nothing
+            emit(WebLayout())
+        }
+    }
+    //Update Page Name
+    fun ktor_deleteOneLayout(
+        layId: String,
+        projectId: String,
+        key: String,
+        mail:String,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_deletelayout") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                            WebLayout(
+                                _id = ObjectId(layId.substringAfter("oid=").substringBefore("}")),
+                                wLayoutProjectId = ObjectId(projectId.substringAfter("oid=").substringBefore("}")),
+                                wLayoutRouteToken ="token",
+                                wLayoutPageName = "todelete",
+                                wLayoutModule = null,
+                                wLayoutModuleType = "",
+                                wLayoutPosition = null,
+                                wLayoutSort = 0L
+                            )
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR delete layout: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR delete layout exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
+    //Update Page Name
+    fun ktor_updatePage(
+        pageName : String,
+        pageId: String,
+        projectId: String,
+        key: String,
+        mail:String,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_updatepage") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                            WebLayout(
+                                _id = ObjectId(pageId.substringAfter("oid=").substringBefore("}")),
+                                wLayoutProjectId = ObjectId(projectId.substringAfter("oid=").substringBefore("}")),
+                                wLayoutRouteToken ="token",
+                                wLayoutPageName = pageName,
+                                wLayoutModule = null,
+                                wLayoutModuleType = "",
+                                wLayoutPosition = null,
+                                wLayoutSort = 0L
+                            )
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR update page: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR update page exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
+    //Insert new Page to ktor
+    fun ktor_insertNewPage(
+        pageName : String,
+        projectId: String,
+        key: String,
+        mail:String,
+    ) : Flow<Boolean> = flow {
+        try {
+            val unixTime = System.currentTimeMillis() / 1000L
+            val allowedChars = ('A'..'Z') + ('a'..'s') + ('0'..'9')
+            val genToken: () -> String = fun(): String {
+                return (1..16)
+                    .map { allowedChars.random() }
+                    .joinToString("")
+            }
+            val token = unixTime.toString() + "tok" + genToken.invoke()
+            //ktor insert
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_addnewpage") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                        WebLayout(
+                              //_id = ObjectId(""),
+                              wLayoutProjectId = ObjectId(projectId),
+                              wLayoutRouteToken = token,
+                              wLayoutPageName = pageName,
+                              wLayoutModule = null,
+                              wLayoutModuleType = "",
+                              wLayoutPosition = null,
+                              wLayoutSort = 0L
+                        )
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR insert page: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR insert page exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
     }
     //Insert project to ktor
     fun ktor_insertProject(

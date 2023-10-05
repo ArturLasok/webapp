@@ -24,7 +24,12 @@ import com.arturlasok.feature_core.presentation.settings_screen.SettingsScreen
 import com.arturlasok.feature_core.presentation.start_screen.StartScreen
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_creator.presentation.creator_addpage.AddPageScreen
 import com.arturlasok.feature_creator.presentation.creator_addproject.AddProjectScreen
+import com.arturlasok.feature_creator.presentation.creator_details.DetailsScreen
+import com.arturlasok.feature_creator.presentation.creator_editmodule.EditModuleScreen
+import com.arturlasok.feature_creator.presentation.creator_editpage.EditPageScreen
+import com.arturlasok.feature_creator.presentation.creator_newmodule.NewModuleScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_addmessage.AddMessageScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
@@ -67,13 +72,14 @@ fun NavigationComponent(
             }
 
         })
+        //
         //NAV Queue
-        /*
+
         Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
            it.destination.route.toString()
         }} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
 
-         */
+
     }
 
     NavHost(
@@ -99,9 +105,6 @@ fun NavigationComponent(
                 navHostController.backQueue.onEach { bce ->
                     bce.getViewModelStore().clear()
                 }
-
-
-
 
             }
 
@@ -564,6 +567,98 @@ fun NavigationComponent(
                     modifierTopBar = modifierTopBar,
                     modifierScaffold = modifierScaffold,
                     )
+
+            }
+        }
+        // Details Screen route
+        composable(
+            route= Screen.DetailsScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                DetailsScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.DetailsScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+        }
+        // New Module Screen
+        composable(
+            route= Screen.NewModuleScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                NewModuleScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.NewModuleScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+        }
+        // Edit Module Screen
+        composable(
+            route= Screen.EditModuleScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                EditModuleScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    navigateTo = { route-> navHostController.navigate(route)},
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.EditModuleScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+        }
+        // Add Page Screen
+        composable(
+            route= Screen.AddPageScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                AddPageScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    navigateTo = { route-> navHostController.navigate(route) {
+                        popUpTo(Screen.DetailsScreen.route) { inclusive = true }
+                    } } ,
+                    navigateUp = { navHostController.popBackStack()},
+                    navScreenLabel = UiText.StringResource(Screen.AddPageScreen.label,"asd").asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
+
+            }
+        }
+        // Edit Page Screen
+        composable(
+            arguments = listOf(navArgument("pageId") { defaultValue = "" }),
+            route= Screen.EditPageScreen.route) {
+            Column() {
+                navTasks(navHostController = navHostController)
+                EditPageScreen(
+                    isSecondScreen = false,
+                    isInDualMode = false,
+                    pageId = it.arguments?.getString("pageId") ?: "",
+                    navigateTo = { route -> navHostController.navigate(route){
+                        popUpTo(Screen.DetailsScreen.route) { inclusive = true }
+                    } },
+                    navigateUp = { navHostController.popBackStack() },
+                    navScreenLabel = UiText.StringResource(Screen.EditPageScreen.label, "asd")
+                        .asString(),
+                    modifierTopBar = modifierTopBar,
+                    modifierScaffold = modifierScaffold,
+                )
 
             }
         }

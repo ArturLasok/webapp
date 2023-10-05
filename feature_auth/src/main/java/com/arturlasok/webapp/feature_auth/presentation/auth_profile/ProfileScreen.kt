@@ -199,8 +199,10 @@ fun ProfileScreen(
                     navigateTo = { route -> navigateTo(route) },
                     navigateUp = {  },
                     profileViewModel.allProjects,
-                    profileViewModel.haveNetwork(),
-                )
+                    profileViewModel.haveNetwork()
+                ) { projectId ->
+                    profileViewModel.setOpenProjectIdInDataStore(projectId) { navigateTo(Screen.DetailsScreen.route) }
+                }
 
             }
         }

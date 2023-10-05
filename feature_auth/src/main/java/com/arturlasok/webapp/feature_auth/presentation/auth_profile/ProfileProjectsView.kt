@@ -49,7 +49,8 @@ fun ProfileProjectsView(
     navigateTo: (route: String) -> Unit,
     navigateUp: () -> Unit,
     allProjects: Pair<MutableState<List<WebProject>>, MutableState<StartProjectsInteractionState>>,
-    haveNetwork :Boolean
+    haveNetwork :Boolean,
+    setOpenProject:(projectId:String) -> Unit,
 
 ) {
     when(allProjects.second.value) {
@@ -65,6 +66,7 @@ fun ProfileProjectsView(
                         navigateTo = { route -> navigateTo(route) },
                         navigateUp = { navigateUp() },
                         project = project,
+                        setOpenProject = { projectId -> setOpenProject(projectId)  }
                     )
                 }
                 //add next project
@@ -72,6 +74,7 @@ fun ProfileProjectsView(
                     navigateTo = { route -> navigateTo(route) },
                     navigateUp = { navigateUp() },
                     project = WebProject(),
+                    setOpenProject = { projectId -> setOpenProject(projectId) }
                 )
             }
 

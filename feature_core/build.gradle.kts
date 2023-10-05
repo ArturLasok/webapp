@@ -57,7 +57,9 @@ android {
 
 dependencies {
     //implementation(project(Modules.feature_auth))
-
+    implementation("org.mongodb:bson-kotlinx:4.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     //DataStore
     implementation(AndroidX.dataStoreCore)
     implementation(AndroidX.dataStorePreferences)

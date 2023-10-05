@@ -24,6 +24,7 @@
     <string name="Screen_Forgot">Forgot password?</string>
     <string name="Screen_Profile">Profile</string>
     <string name="Screen_AddProject">Add Project</string>
+    <string name="Screen_Details">Project View</string>
     <string name="core_yes">Yes</string>
     <string name="core_no">No</string>
     <string name="core_logout_question">Are you sure you want to log out now?</string>
@@ -31,4 +32,8 @@
     <string name="core_clear">Clear</string>
     <string name="core_refresh">Refresh</string>
     <string name="core_trytoconnect">Try to connect</string>
+    <string name="Screen_NewModule">Add Module</string>
+    <string name="Screen_EditModule">Edit Module</string>
+    <string name="Screen_AddPage">Add Page</string>
+    <string name="Screen_EditPage">Edit Page</string>
 </resources>

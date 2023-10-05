@@ -6,6 +6,8 @@ sealed class ProjectInteractionState {
 
     object Interact: ProjectInteractionState()
 
+    object Checking: ProjectInteractionState()
+
     object OnComplete :ProjectInteractionState()
 
     class IsSuccessful(val message: String? = null) : ProjectInteractionState()

@@ -23,4 +23,6 @@ object AndroidX {
     const val lifeCyc = "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     const val lifeCycVm = "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
 
+
+
 }

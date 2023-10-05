@@ -18,6 +18,7 @@
     <string name="creator_domainSelectOne">Select one of the available domain\'s"</string>
     <string name="creator_domainsCheck">I\'m checking is domain are free</string>
     <string name="creator_refresh">Refresh form</string>
+    <string name="creator_refreshit">Refresh</string>
     <string name="creator_share">Share</string>
     <string name="creator_copy">Copy</string>
     <string name="creator_next_step">Login or sign up</string>
@@ -25,4 +26,25 @@
     <string name="creator_successInfo">Your website was created. You can check it in web browser by clicking address on row below:</string>
     <string name="creator_successInfoTwo">Now is time to add details to your website. Add title, logo, menus, icons, forms and a lot more features are available to you. To continue working on the project, you must sign up or log in. All projects from this device will be linked to your account once you log in or sign up.</string>
     <string name="creator_copyLink">Copy link</string>
+    <string name="creator_module_text">Text</string>
+    <string name="creator_module_menu">Menu</string>
+    <string name="creator_module_toplogo">Top Logo</string>
+    <string name="creator_module_img">Image</string>
+    <string name="creator_module_spacer">Spacer</string>
+    <string name="creator_module_news">News</string>
+    <string name="creator_module_link">Link</string>
+    <string name="creator_addPageLabel">Subpage name</string>
+    <string name="creator_addPageSubmit">Add new subpage</string>
+    <string name="creator_projectPage">Project page</string>
+    <string name="creator_addPageLabelError">Not accepted name</string>
+    <string name="creator_addPageFormError">Insert page name correctly</string>
+    <string name="creator_addPageApiError">Page cannot be added at this time.</string>
+    <string name="creator_details_homescreen">Home Screen</string>
+    <string name="creator_editpage_updatebutton">Update page</string>
+    <string name="creator_editpage_pageUpdated">Page updated</string>
+    <string name="creator_editpageDeleted">Page deleted</string>
+    <string name="creator_editpageDelete_question">Are you sure you want to delete the page and all its content?</string>
+    <string name="creator_editpage_api_error">You cannot edit this page. The page is not available at the moment.</string>
+    <string name="creator_editpageinfo">You can now rename the page or delete the page and all its content.</string>
+    <string name="creator_addpageinfo">Enter the name of the subpage for your project. The name will only be visible to you and will be used to identify the site. You will be able to link the new subpage to the main page using the MENU. If you haven\'t added MENU yet, you can do it at any time in the design window.</string>
 </resources>

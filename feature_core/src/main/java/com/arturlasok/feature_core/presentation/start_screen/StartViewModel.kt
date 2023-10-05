@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,7 +87,16 @@ class StartViewModel @Inject constructor(
     fun getProjectTemporaryTokenStore() : Flow<String> {
         return dataStoreInteraction.getProjectTemporaryToken()
     }
+    fun getOpenProjectIdFromDataStore() : Flow<String> {
+        return dataStoreInteraction.getOpenProjectId()
+    }
+    fun setOpenProjectIdInDataStore(projectId:String, action:()->Unit) {
+        viewModelScope.launch {
+            Log.i(TAG,"set project id: ${projectId.substringAfter("oid=").substringBefore("}")}")
+            dataStoreInteraction.setOpenProjectId(projectId.substringAfter("oid=").substringBefore("}"))
 
+        }.invokeOnCompletion {  action() }
+    }
     fun getAllProjectsFromKtor() {
         allProjects.second.value = StartProjectsInteractionState.Interact
         getProjectTemporaryTokenStore().take(1).onEach { tempToken ->

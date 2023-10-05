@@ -31,20 +31,22 @@ import com.arturlasok.feature_core.navigation.Screen
 fun OneProjectButton(
     navigateTo: (route: String) -> Unit,
     navigateUp:()->Unit,
-    project: WebProject
+    project: WebProject,
+    setOpenProject:(projectId:String) -> Unit,
 ) {
     if(project.wProject_address.isNotEmpty()) {
         Surface(
             modifier = Modifier.padding(10.dp),
-            color = Color.Transparent,
+            color = MaterialTheme.colors.primary.copy(alpha = 1.0f),
             shape = MaterialTheme.shapes.medium,
-            border = BorderStroke(1.dp,MaterialTheme.colors.primary)
+            border = BorderStroke(1.dp,MaterialTheme.colors.primary),
+            elevation = 8.dp
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.width(100.dp).height(100.dp)
-
+                    .clickable(onClick = { setOpenProject(project._id.toString()); })
             ) {
 
                 Image(
@@ -84,7 +86,7 @@ fun OneProjectButton(
         Surface(
             modifier = Modifier.padding(10.dp),
             shape = MaterialTheme.shapes.medium,
-            color = Color.Transparent,
+            color = MaterialTheme.colors.primary.copy(alpha = 0.5f),
             border = BorderStroke(1.dp,MaterialTheme.colors.primary)
         ) {
             Column(

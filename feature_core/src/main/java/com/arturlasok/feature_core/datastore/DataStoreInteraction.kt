@@ -109,4 +109,19 @@ class DataStoreInteraction @Inject constructor(
             pref[TEMPORARY_PROJECTS_TOKEN] = value
         }
     }
+    //open project
+    fun getOpenProjectId() : Flow<String> {
+        val OPEN_PROJECT = stringPreferencesKey("open_project")
+        val dataFromStore : Flow<String> =  dataStore.data.map { pref->
+            pref[OPEN_PROJECT] ?: ""
+        }
+
+        return dataFromStore
+    }
+    suspend fun setOpenProjectId(value: String) {
+        val OPEN_PROJECT = stringPreferencesKey("open_project")
+        dataStore.edit { pref ->
+            pref[OPEN_PROJECT] = value
+        }
+    }
 }

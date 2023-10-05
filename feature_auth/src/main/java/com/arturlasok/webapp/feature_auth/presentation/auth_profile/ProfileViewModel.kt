@@ -132,6 +132,14 @@ class ProfileViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
     }
+    fun setOpenProjectIdInDataStore(projectId:String, action:()->Unit) {
+        viewModelScope.launch {
+            Log.i(TAG,"set project id: ${projectId.substringAfter("oid=").substringBefore("}")}")
+            dataStoreInteraction.setOpenProjectId(projectId.substringAfter("oid=").substringBefore("}"))
+        }.invokeOnCompletion {
+            action()
+        }
+    }
     fun getProjectTemporaryTokenStore() : Flow<String> {
         return dataStoreInteraction.getProjectTemporaryToken()
     }

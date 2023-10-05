@@ -1,0 +1,12 @@
+package com.arturlasok.feature_creator.model
+
+import androidx.compose.runtime.MutableState
+
+data class EditPageDataState(
+    val editPageName: MutableState<String>,
+    val editPageId: String,
+    val editPageProjectId: String,
+    val editPageInteractionState: MutableState<ProjectInteractionState>,
+    val editPageSaveInteractionState: MutableState<ProjectInteractionState>,
+    val editPageDeleteInteractionState: MutableState<ProjectInteractionState>,
+)

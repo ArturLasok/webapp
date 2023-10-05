@@ -84,19 +84,16 @@ fun StartScreen(
                     TopBack(isHome = true, isSecondScreen = false,isInDualMode = false,routeLabel = navScreenLabel, onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
-
                 //End
                 Row {
                     TopAuth(navigateTo = { route -> navigateTo(route) }, fireAuth = startViewModel.getFireAuth(), notViewed = startViewModel.numberNotViewedMessages().collectAsState(initial = 0).value )
                     TopSettings( navigateTo = { route-> navigateTo(route)})
                     //TopNetwork(isNetworkAvailable = startViewModel.haveNetwork())
                 }
-
-
             }
         },
         bottomBar ={
-            //Text(text="${startViewModel.allProjects.second.value} // size: ${startViewModel.allProjects.first.value.size}")
+
         }
     ) { paddingValues ->
         //content
@@ -125,6 +122,7 @@ fun StartScreen(
                                 navigateTo = { route -> navigateTo(route) },
                                 navigateUp = { navigateUp() },
                                 project = project,
+                                setOpenProject = { projectId -> startViewModel.setOpenProjectIdInDataStore(projectId = projectId, action = {navigateTo(Screen.DetailsScreen.route) })  }
                             )
                         }
                         //add next project
@@ -132,6 +130,10 @@ fun StartScreen(
                             navigateTo = { route -> navigateTo(route) },
                             navigateUp = { navigateUp() },
                             project = WebProject(),
+                            setOpenProject = {
+                                //projectId -> startViewModel.setOpenProjectIdInDataStore(projectId= projectId);
+                                //navigateTo(Screen.DetailsScreen.route)
+                            }
                         )
                     }
 

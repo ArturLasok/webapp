@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -39,10 +40,15 @@ fun CreatorTextField(
     maxStringLength: Int,
     isRed:MutableState<Boolean>,
     onlyLower: Boolean,
+    noWhiteSpace: Boolean = true,
     enabled: Boolean,
     ) {
     fun lowerCheck(str: TextFieldValue): TextFieldValue{
-        return if(onlyLower) str.copy(text = str.text.lowercase().trim(), selection = str.selection)  else str.copy(text = str.text.trim(), selection = str.selection)
+        return if(noWhiteSpace) {
+            if(onlyLower) str.copy(text = str.text.lowercase().trim(), selection = str.selection)  else str.copy(text = str.text.trim(), selection = str.selection)
+        } else {
+            if(onlyLower) str.copy(text = str.text.lowercase(), selection = str.selection)  else str.copy(text = str.text, selection = str.selection)
+        }
     }
     val textField = remember { mutableStateOf(TextFieldValue(text = content)) }
     val isValidContent =  if(isValidString(content) && content.isNotEmpty() && !isRed.value)
@@ -68,7 +74,13 @@ fun CreatorTextField(
             if(newInput.text.length<maxStringLength+1) {
                 textField.value = lowerCheck(newInput)
                 isValidContent.value = isValidString(textField.value.text)
-                setContent(newInput.text.lowercase().trim())
+                if(noWhiteSpace) {
+                if(onlyLower) setContent(newInput.text.lowercase().trim()) else setContent(newInput.text.trim())
+                } else {
+                if(onlyLower) setContent(newInput.text.lowercase()) else setContent(newInput.text)
+                }
+
+
             }
                         },
         shape = MaterialTheme.shapes.large,

@@ -9,12 +9,9 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
 import com.arturlasok.feature_core.util.isOnline
-//import com.arturlasok.feature_core.datastore.DataStoreInteraction
-//import com.arturlasok.feature_core.util.Test
-//import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.webapp.BaseApplication
 import com.arturlasok.webapp.feature_auth.model.MessageListGlobalState
-//import com.arturlasok.feature_core.util.SavedStateHandlerInteraction
+import com.arturlasok.webapp.util.LocalObjectIdSerializer
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
@@ -25,23 +22,32 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
+import org.bson.codecs.kotlinx.ObjectIdSerializer
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Singleton
     @Provides
     fun provideKtorClient() : HttpClient {
        return HttpClient {
            install(ContentNegotiation) {
                json(Json {
+                  // serializersModule = SerializersModule {  contextual( ObjectIdSerializer) }
+                   prettyPrint = true
                    ignoreUnknownKeys = true
-                   useAlternativeNames = false
+                   //useAlternativeNames = false
+                   encodeDefaults = true
 
                })
+
            }
        }
     }

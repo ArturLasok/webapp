@@ -70,12 +70,9 @@ android {
 
 dependencies {
 
-    //implementation("com.android.support:multidex:1.0.3")
+    implementation("org.mongodb:bson-kotlinx:4.10.1")
     implementation("androidx.compose.runtime:runtime:1.2.1")
-    //kapt("androidx.hilt:hilt-compiler:1.0.0")
-    //implementation("androidx.core:core-ktx:1.10.1")
 
-   // implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation(platform("androidx.compose:compose-bom:2022.10.00"))
     //Modules to :app
     implementation(project(Modules.feature_core))

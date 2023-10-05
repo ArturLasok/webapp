@@ -26,6 +26,16 @@ sealed class  Screen(val route:String, val routeWithArgs:String,val arguments: L
 
     object AddProjectScreen:Screen("AddProjectScreen","AddProjectScreen", emptyList(),R.string.Screen_AddProject)
 
+    object DetailsScreen:Screen("DetailsScreen?openId={openId}","DetailsScreen", emptyList(),R.string.Screen_Details)
+
+    object NewModuleScreen:Screen("NewModuleScreen","NewModuleScreen", emptyList(),R.string.Screen_NewModule)
+
+    object EditModuleScreen:Screen("EditModuleScreen","EditModuleScreen", emptyList(),R.string.Screen_EditModule)
+
+    object AddPageScreen:Screen("AddPageScreen","AddPageScreen", emptyList(),R.string.Screen_AddPage)
+
+    object EditPageScreen:Screen("EditPageScreen?pageId={pageId}","EditPageScreen", emptyList(),R.string.Screen_EditPage)
+
 
 }
 
