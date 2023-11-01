@@ -6,6 +6,7 @@ data class EditPageDataState(
     val editPageName: MutableState<String>,
     val editPageId: String,
     val editPageProjectId: String,
+    val editPageRouteToken:String,
     val editPageInteractionState: MutableState<ProjectInteractionState>,
     val editPageSaveInteractionState: MutableState<ProjectInteractionState>,
     val editPageDeleteInteractionState: MutableState<ProjectInteractionState>,

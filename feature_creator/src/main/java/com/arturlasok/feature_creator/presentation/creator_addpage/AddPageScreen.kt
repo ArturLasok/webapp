@@ -197,7 +197,7 @@ fun AddPageScreen(
                     )
                     {
                         Text(
-                            text = UiText.StringResource(R.string.creator_editpageinfo, "asd").asString(),
+                            text = UiText.StringResource(R.string.creator_addpageinfo, "asd").asString(),
                             style = MaterialTheme.typography.h3
                         )
                         Spacer(modifier = Modifier

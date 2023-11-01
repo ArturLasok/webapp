@@ -31,19 +31,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
 import com.arturlasok.feature_core.navigation.Screen
+import com.arturlasok.feature_core.util.ColorType
+import com.arturlasok.feature_core.util.ExtraColors
 import com.arturlasok.feature_core.util.UiText
 import com.arturlasok.feature_creator.model.CreatorDataState
 import com.arturlasok.feature_creator.model.ProjectInteractionState
 
 @Composable
 fun PagesLazyColumn(
+    darkTheme:Boolean,
     navigateTo: (route: String) -> Unit,
     navigateUp: () -> Unit,
     pageList: List<WebLayout>,
     getPagesState: ProjectInteractionState,
     creatorDataState: CreatorDataState,
     screenRefresh: () -> Unit,
-    setSelectedPageToken:(token:String) -> Unit
+    setSelectedPageToken:(token:String) -> Unit,
+
 ) {
 
     val pagesColumnState = rememberLazyListState()
@@ -107,68 +111,7 @@ fun PagesLazyColumn(
                 .width(40.dp)
                 .background(Color.Transparent))
         }
-        //Start Page
-        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
 
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                elevation = 6.dp,
-                color = if(creatorDataState.projectSelectedPageToken.value.isEmpty()) { Color.Yellow } else { MaterialTheme.colors.background },
-                modifier = Modifier
-                    .padding(
-                        start = 12.dp,
-                        end = 0.dp,
-                        bottom = 6.dp
-                    )
-                    .padding(top = 0.dp)
-                    .height(60.dp)
-                    .fillMaxWidth(fraction = 0.90f)
-            ) {
-                Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    IconButton(
-                        onClick = { setSelectedPageToken("") },
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .fillMaxSize()
-
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-
-                                Icons.Filled.WebAsset,
-                                UiText.StringResource(
-                                    com.arturlasok.feature_creator.R.string.creator_details_homescreen,
-                                    "asd"
-                                ).asString(),
-                                tint = MaterialTheme.colors.onBackground,
-                                modifier = Modifier.width(32.dp),
-                            )
-                            Text(
-                                text = UiText.StringResource(
-                                    com.arturlasok.feature_creator.R.string.creator_details_homescreen,
-                                    "asd"
-                                ).asString().uppercase(),
-                                style = MaterialTheme.typography.h6
-                            )
-                        }
-                    }
-
-                }
-            }
-            Spacer(modifier= Modifier
-                .height(2.dp)
-                .width(40.dp)
-                .background(if(creatorDataState.projectSelectedPageToken.value.isEmpty()) { Color.Yellow } else { Color.Transparent})
-            )
-        }
         //Rest of pages
         //if(getPagesState == ProjectInteractionState.Idle) {
             LazyColumn(
@@ -188,7 +131,12 @@ fun PagesLazyColumn(
                         Surface(
                             shape = MaterialTheme.shapes.medium,
                             elevation = 6.dp,
-                            color = if(creatorDataState.projectSelectedPageToken.value==onePage.wLayoutRouteToken) { Color.Yellow } else { MaterialTheme.colors.background },
+                            color = if(creatorDataState.projectSelectedPageToken.value==onePage.wLayoutRouteToken) {
+                                ExtraColors(
+                                    type = ColorType.DESIGNONE,
+                                    darktheme = darkTheme
+                                )
+                            } else { MaterialTheme.colors.background },
                             modifier = Modifier
                                 .padding(
                                     start = 12.dp,
@@ -245,7 +193,18 @@ fun PagesLazyColumn(
                             modifier = Modifier
                                 .height(2.dp)
                                 .width(40.dp)
-                                .background(if(creatorDataState.projectSelectedPageToken.value==onePage.wLayoutRouteToken) { Color.Yellow } else { Color.Transparent})
+                                .background(
+                                    if (creatorDataState.projectSelectedPageToken.value == onePage.wLayoutRouteToken
+                                        && creatorDataState.projectGetAllModulesState.value == ProjectInteractionState.Idle
+                                    ) {
+                                        ExtraColors(
+                                            type = ColorType.DESIGNONE,
+                                            darktheme = darkTheme
+                                        )
+                                    } else {
+                                        Color.Transparent
+                                    }
+                                )
                         )
                     }
                 }
@@ -327,7 +286,10 @@ fun PagesLazyColumn(
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     elevation = 6.dp,
-                    color = Color.Yellow,
+                    color = ExtraColors(
+                        type = ColorType.DESIGNONE,
+                        darktheme = darkTheme
+                    ),
                     modifier = Modifier
                         .padding(
                             start = 12.dp,
@@ -355,7 +317,9 @@ fun PagesLazyColumn(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                LinearProgressIndicator(color = MaterialTheme.colors.primary, modifier = Modifier.height(2.dp).padding(start = 4.dp, end = 4.dp))
+                                LinearProgressIndicator(color = MaterialTheme.colors.primary, modifier = Modifier
+                                    .height(2.dp)
+                                    .padding(start = 4.dp, end = 4.dp))
                             }
                         }
 

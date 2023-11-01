@@ -65,6 +65,8 @@ dependencies {
     implementation(AndroidX.dataStorePreferences)
     //Hilt
     implementation(Hilt.hiltAndroid)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("junit:junit:4.12")
     kapt(Hilt.hiltKapt)
     implementation(AndroidX.hiltNav)
     //Compose
@@ -94,4 +96,6 @@ dependencies {
     //implementation(AndroidX.lifeCyc)
    // implementation(AndroidX.lifeCycVm)
    // implementation(AndroidX.lifektx)
+    //Test
+    testImplementation("androidx.compose.ui:ui-test-junit4-android:1.5.3")
 }

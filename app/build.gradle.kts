@@ -113,6 +113,7 @@ dependencies {
     implementation(Room.roomKtx)
 
     //Test
+    testImplementation("androidx.compose.ui:ui-test-junit4-android:1.5.3")
 /*
     // Core library
     val androidXTestVersion = "1.5.0"

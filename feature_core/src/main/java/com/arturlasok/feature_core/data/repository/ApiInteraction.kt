@@ -3,10 +3,12 @@ package com.arturlasok.feature_core.data.repository
 
 import android.os.Build
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
 import com.arturlasok.feature_core.BuildConfig
 import com.arturlasok.feature_core.data.datasource.api.model.WebDomains
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
+import com.arturlasok.feature_core.data.datasource.api.model.WebMenu
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
 import com.arturlasok.feature_core.data.datasource.api.model.WebProject
 import com.arturlasok.feature_core.data.datasource.api.model.WebUser
@@ -361,6 +363,98 @@ class ApiInteraction(
             else { emit(false) }
         } catch(e:java.lang.Exception) {
             Log.i(TAG, "KTOR update page exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
+    //Get menus by place getmenusbyplace
+    fun ktor_getMenusByPlace(
+        key: String,
+        mail:String,
+        menuPlace:String,
+        projectId: String,
+    ) : Flow<Pair<Boolean,List<WebMenu>>> = flow {
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getmenusbyplace") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            key,
+                            mail,
+                            WebMenu(
+                                wMenuProjectId = ObjectId(projectId),
+                                wMenuPlace = menuPlace,
+                                wMenuRoute ="",
+                                wMenuSort = 0L,
+                                wMenuColor = "",
+                                wMenuTextColor = "",
+                                wMenuIconTint = "",
+                            )
+                        )
+                    )
+                }
+            val listType = object : TypeToken<List<WebMenu>>() {}.type
+            val data = Gson().fromJson<List<WebMenu>>(response.bodyAsText(),listType)
+            Log.i(TAG, "KTOR get menus: ${response.status}")
+            //200 OK
+            if(response.status.value==200) { emit(Pair(true, data)) }
+            else { emit(Pair(false, listOf())) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get menus exception: ${e.message}")
+            //do nothing
+            emit(Pair(false,listOf()))
+        }
+
+    }
+    //Insert new menu to ktor
+    fun ktor_insertNewMenu(
+        key: String,
+        mail:String,
+        menuPlace:String,
+        menuRoute:String,
+        menuSort: Long = System.currentTimeMillis(),
+        menuColor: String,
+        menuTextColor:String,
+        menuIconTint:String,
+        projectId: String,
+
+    ) : Flow<Boolean> = flow {
+        try {
+            val unixTime = System.currentTimeMillis() / 1000L
+            val allowedChars = ('A'..'Z') + ('a'..'s') + ('0'..'9')
+            val genToken: () -> String = fun(): String {
+                return (1..16)
+                    .map { allowedChars.random() }
+                    .joinToString("")
+            }
+            val token = unixTime.toString() + "tok" + genToken.invoke()
+            //ktor insert
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_addnewmenu") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            key,
+                            mail,
+                            WebMenu(
+                                wMenuProjectId = ObjectId(projectId),
+                                wMenuPlace = menuPlace,
+                                wMenuRoute = menuRoute,
+                                wMenuSort = menuSort,
+                                wMenuColor = menuColor,
+                                wMenuTextColor = menuTextColor,
+                                wMenuIconTint = menuIconTint,
+                            )
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR insert menu: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR insert menu exception: ${e.message}")
             //do nothing
             emit(false)
         }

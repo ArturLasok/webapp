@@ -36,12 +36,14 @@ class EditPageViewModel@Inject constructor(
     private val editPageId = savedStateHandle.getStateFlow("editPageId","")
     private val editPageName = savedStateHandle.getStateFlow("editPageName","")
     private val editPageProjectId = savedStateHandle.getStateFlow("editProjectId","")
+    private val editPageRouteToken = savedStateHandle.getStateFlow("editPageRouteToken","")
 
     val editPageDataState = mutableStateOf(
         EditPageDataState(
             editPageName = mutableStateOf(editPageName.value),
             editPageId = editPageId.value,
             editPageProjectId = editPageProjectId.value,
+            editPageRouteToken = editPageRouteToken.value,
             editPageInteractionState = mutableStateOf<ProjectInteractionState>(ProjectInteractionState.Idle),
             editPageSaveInteractionState = mutableStateOf<ProjectInteractionState>(ProjectInteractionState.Idle),
             editPageDeleteInteractionState = mutableStateOf<ProjectInteractionState>(ProjectInteractionState.Idle)
@@ -69,6 +71,10 @@ class EditPageViewModel@Inject constructor(
     fun setEditProjectId(id:String) {
         savedStateHandle["editProjectId"] = id
         editPageDataState.value = editPageDataState.value.copy(editPageProjectId =id)
+    }
+    fun setEditPageRouteToken(token:String) {
+        savedStateHandle["editPageRouteToken"] = token
+        editPageDataState.value = editPageDataState.value.copy(editPageRouteToken = token)
     }
     fun deletePage() {
         //todo delete all connected modules
@@ -143,6 +149,7 @@ class EditPageViewModel@Inject constructor(
                     setEditPageName(layout.wLayoutPageName)
                     setEditPageId(pageId)
                     setEditProjectId(layout.wLayoutProjectId.toString())
+                    setEditPageRouteToken(layout.wLayoutRouteToken)
                     setEditPageInteractionState(ProjectInteractionState.OnComplete)
                 } else {
                     setEditPageInteractionState(

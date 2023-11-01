@@ -255,10 +255,12 @@ fun EditPageScreen(
 
                 //End
                 Row {
-                    DeleteIcon(tint = MaterialTheme.colors.onSecondary) {
-                        editPageViewModel.setEditPageDeleteState(ProjectInteractionState.Interact)
+                    if(editPageDataState.editPageRouteToken!=editPageDataState.editPageProjectId.substringAfter("oid=").substringBefore("}")) {
+                        DeleteIcon(tint = MaterialTheme.colors.onSecondary) {
+                            editPageViewModel.setEditPageDeleteState(ProjectInteractionState.Interact)
+                        }
                     }
-                    TopSettings(navigateTo = { route -> navigateTo(route) })
+                    //TopSettings(navigateTo = { route -> navigateTo(route) })
 
                     //TopNetwork(isNetworkAvailable = startViewModel.haveNetwork())
                 }
@@ -267,11 +269,14 @@ fun EditPageScreen(
             }
         },
         bottomBar = {
+
             Column {
-                Text("page id: $pageId", style = MaterialTheme.typography.h5)
+                Text("page id: $pageId / ProjectID: ${editPageDataState.editPageProjectId} / RouteToken: ${editPageDataState.editPageRouteToken}", style = MaterialTheme.typography.h5)
                 Text("page id: ${editPageDataState.toString()}", style = MaterialTheme.typography.h5)
 
             }
+
+
 
         },
 
