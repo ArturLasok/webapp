@@ -32,7 +32,7 @@
     <string name="core_clear">Clear</string>
     <string name="core_refresh">Refresh</string>
     <string name="core_trytoconnect">Try to connect</string>
-    <string name="Screen_NewModule">Add Module</string>
+    <string name="Screen_Module">Page Content</string>
     <string name="Screen_EditModule">Edit Module</string>
     <string name="Screen_AddPage">Add Page</string>
     <string name="Screen_EditPage">Edit Page</string>

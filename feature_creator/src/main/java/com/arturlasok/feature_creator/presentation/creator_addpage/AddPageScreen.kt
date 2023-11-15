@@ -6,6 +6,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,9 +48,11 @@ import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_core.util.getDarkBoolean
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.feature_creator.R
 import com.arturlasok.feature_creator.components.CreatorTextField
+import com.arturlasok.feature_creator.components.IconsLazyRow
 import com.arturlasok.feature_creator.components.SubmitButton
 import com.arturlasok.feature_creator.model.ProjectInteractionState
 import kotlinx.coroutines.delay
@@ -199,6 +202,15 @@ fun AddPageScreen(
                         Text(
                             text = UiText.StringResource(R.string.creator_addpageinfo, "asd").asString(),
                             style = MaterialTheme.typography.h3
+                        )
+                        Spacer(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(12.dp))
+                        IconsLazyRow(
+                            darkTheme = getDarkBoolean(isSystemInDarkTheme(),dataStoreDarkTheme.value),
+                            iconsList = addPageViewModel.iconList,
+                            selectedIconName = addPageViewModel.newPageDataState.value.newPageIconName,
+                            setSelectedIconName = addPageViewModel::setNewPageIconName
                         )
                         Spacer(modifier = Modifier
                             .fillMaxWidth()

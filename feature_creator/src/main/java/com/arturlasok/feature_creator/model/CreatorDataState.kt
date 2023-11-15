@@ -24,8 +24,12 @@ data class CreatorDataState(
     val projectMenuLoadingState: MutableState<@Contextual ProjectInteractionState>,
     @Contextual
     val projectPageMenuList: SnapshotStateList<WebMenu>,
+    @Contextual
+    val projectPageOriginalSortedList: SnapshotStateList<WebMenu>,
     val projectSelectedMenuToken: MutableState<String>,
+    val projectDeleteMenuState: MutableState<@Contextual ProjectInteractionState>,
     val projectInsertMenuState: MutableState<@Contextual ProjectInteractionState>,
+    val projectReorderMenuState:MutableState<@Contextual ProjectInteractionState>,
     val projectMenuViewState: MutableState<@Contextual ProjectMenuViewState>
 
 )

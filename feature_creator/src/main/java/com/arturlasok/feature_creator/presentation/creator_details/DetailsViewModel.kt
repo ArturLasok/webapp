@@ -8,6 +8,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arturlasok.feature_core.data.datasource.api.model.WebMenu
 import com.arturlasok.feature_core.data.repository.ApiInteraction
 import com.arturlasok.feature_core.data.repository.RoomInteraction
 import com.arturlasok.feature_core.datastore.DataStoreInteraction
@@ -19,6 +20,7 @@ import com.arturlasok.feature_creator.R
 import com.arturlasok.feature_creator.model.CreatorDataState
 import com.arturlasok.feature_creator.model.ProjectInteractionState
 import com.arturlasok.feature_creator.model.ProjectMenuViewState
+import com.arturlasok.feature_creator.util.IconsForPages
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import org.bson.types.ObjectId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,6 +47,7 @@ class DetailsViewModel @Inject constructor(
     private val selectedPageToken = savedStateHandle.getStateFlow("selectedPageToken","Home")
     private val selectedMenuToken = savedStateHandle.getStateFlow("selectedMenuToken","Home")
 
+    val iconList = IconsForPages().returnIcons()
 
     val creatorDataState = mutableStateOf(
         CreatorDataState(
@@ -57,14 +61,16 @@ class DetailsViewModel @Inject constructor(
 
             projectMenuLoadingState = mutableStateOf(ProjectInteractionState.Idle),
             projectPageMenuList = mutableStateListOf(),
+            projectPageOriginalSortedList = mutableStateListOf(),
 
             projectSelectedMenuToken = mutableStateOf(selectedMenuToken.value),
+            projectDeleteMenuState = mutableStateOf(ProjectInteractionState.Idle),
             projectInsertMenuState = mutableStateOf(ProjectInteractionState.Idle),
+            projectReorderMenuState = mutableStateOf(ProjectInteractionState.Idle),
             projectMenuViewState = mutableStateOf(ProjectMenuViewState.Short)
 
         )
     )
-
 
     //name,icon,type
     private val listOfWebModules = mutableStateListOf<Triple<Int,Int,ModuleType>>()
@@ -109,10 +115,74 @@ class DetailsViewModel @Inject constructor(
         setGetAllModuleState(ProjectInteractionState.Interact)
 
         viewModelScope.launch {
-            delay(2000)
+            //delay(2000)
             setGetAllModuleState(ProjectInteractionState.Idle)
         }
 
+
+    }
+    fun deleteOneMenu(webMenu: WebMenu) {
+
+        setDeleteMenuState(ProjectInteractionState.Interact)
+        apiInteraction.ktor_deleteOneMenu(
+            menu = webMenu,
+            key = getFireAuth().currentUser?.uid ?: "",
+            mail = getUserMail(),
+        ).onEach { response ->
+            if (response) {
+
+                setDeleteMenuState(ProjectInteractionState.OnComplete)
+                setSelectedPageToken(creatorDataState.value.projectSelectedPageToken.value)
+            } else {
+
+                //delError
+                setDeleteMenuState(
+                    ProjectInteractionState.Error(
+                        message = UiText.StringResource(
+                            R.string.creator_deleteMenuApiError,
+                            "asd"
+                        ).asString(applicationContext)
+                    )
+                )
+            }
+        }.launchIn(viewModelScope)
+
+    }
+    fun saveNewMenuOrder(menuListForPage: List<WebMenu>) {
+        val menuReadyToSave: MutableList<WebMenu> = mutableListOf()
+
+        menuListForPage.onEachIndexed { index,oneMenu ->
+
+            menuReadyToSave.add(oneMenu.copy(_id = ObjectId(oneMenu._id.toString().substringAfter("oid=").substringBefore("}")),wMenuSort = index.toLong(),
+                wMenuProjectId = ObjectId(oneMenu.wMenuProjectId.toString().substringAfter("oid=").substringBefore("}"))
+            ))
+        }
+        menuReadyToSave.onEach { dane->
+            Log.i(TAG,dane._id.toString())
+        }
+
+
+
+        setReorderMenuState(ProjectInteractionState.Interact)
+        apiInteraction.ktor_updateMenuReorder(
+            key = getFireAuth().currentUser?.uid ?: "",
+            mail = getUserMail(),
+            menuList = menuReadyToSave.toList()
+        ).onEach { response->
+            if(response) {
+                setReorderMenuState(ProjectInteractionState.OnComplete)
+                setSelectedPageToken(creatorDataState.value.projectSelectedPageToken.value)
+            }
+            else {
+                setReorderMenuState(ProjectInteractionState.Error(
+                    message = UiText.StringResource(
+                        R.string.creator_reorderMenuError,
+                        "asd"
+                    ).asString(applicationContext)
+                ))
+            }
+
+        }.launchIn(viewModelScope)
 
     }
     fun addRouteToThisMenu(routeToken:String, placeToken:String) {
@@ -129,8 +199,6 @@ class DetailsViewModel @Inject constructor(
             projectId = creatorDataState.value.projectId.value,
         ).onEach { response ->
 
-            //delay(1000)
-            Log.i(TAG, "KTOR insert menu rrsposne in vm: ${response}")
             if (response) {
 
                 setInsertMenuState(ProjectInteractionState.OnComplete)
@@ -153,8 +221,9 @@ class DetailsViewModel @Inject constructor(
     fun insertMenu(autoLink:Boolean) {
         var error = false
         var isCompleted = false
+        var finish = 0
         setInsertMenuState(ProjectInteractionState.Interact)
-
+        Log.i(TAG,"+++add menu HOME")
         apiInteraction.ktor_insertNewMenu(
             key = getFireAuth().currentUser?.uid ?: "",
             mail = getUserMail(),
@@ -165,9 +234,9 @@ class DetailsViewModel @Inject constructor(
             menuIconTint = "TintIconColor",
             projectId = creatorDataState.value.projectId.value,
         ).onEach { response ->
-            //delay(3000)
+
             if(response) {
-                //setInsertMenuState(ProjectInteractionState.OnComplete)
+                Log.i(TAG,"+++add menu HOME")
             } else {
                 error = true
                 //addError
@@ -186,12 +255,15 @@ class DetailsViewModel @Inject constructor(
 
 
             if(autoLink && !error && otherSize>0) {
+
                 setInsertMenuState(ProjectInteractionState.Interact)
                 //autolink
                 creatorDataState.value.projectPagesList.filter {
                     it.wLayoutRouteToken != creatorDataState.value.projectSelectedPageToken.value
                             && it.wLayoutRouteToken != creatorDataState.value.projectId.value
                 }.onEach {
+
+                    Log.i(TAG,"+++add menu ${it.wLayoutRouteToken}")
                     apiInteraction.ktor_insertNewMenu(
                         key = getFireAuth().currentUser?.uid ?: "",
                         mail = getUserMail(),
@@ -204,13 +276,13 @@ class DetailsViewModel @Inject constructor(
                     ).onEach { response ->
 
                         if(response) {
-                            if(!isCompleted) {
-                                setInsertMenuState(ProjectInteractionState.OnComplete)
-                                //setSelectedMenuToken(creatorDataState.value.projectSelectedPageToken.value)
-                                setSelectedPageToken(creatorDataState.value.projectSelectedPageToken.value)
-                            isCompleted = true
-                            }
+                            finish++
 
+                            if(finish==otherSize) {
+                                Log.i(TAG,">>>COMPLETE<<<<")
+                                setInsertMenuState(ProjectInteractionState.OnComplete)
+                                setSelectedPageToken(creatorDataState.value.projectSelectedPageToken.value)
+                            }
                         } else {
                             //addError
                             setInsertMenuState(ProjectInteractionState.Error(message = UiText.StringResource(
@@ -219,8 +291,11 @@ class DetailsViewModel @Inject constructor(
                             ).asString(applicationContext)))
                         }
 
+
                     }.launchIn(viewModelScope)
+
                 }
+
             } else  {
                 if(error) {
                     //add error
@@ -230,7 +305,6 @@ class DetailsViewModel @Inject constructor(
                     ).asString(applicationContext)))
                 } else {
                     setInsertMenuState(ProjectInteractionState.OnComplete)
-                    //setSelectedMenuToken(creatorDataState.value.projectSelectedPageToken.value)
                     setSelectedPageToken(creatorDataState.value.projectSelectedPageToken.value)
                 }
             }
@@ -253,6 +327,8 @@ class DetailsViewModel @Inject constructor(
             if(menuList.first) {
                 creatorDataState.value.projectPageMenuList.clear()
                 creatorDataState.value.projectPageMenuList.addAll(menuList.second)
+                creatorDataState.value.projectPageOriginalSortedList.clear()
+                creatorDataState.value.projectPageOriginalSortedList.addAll(menuList.second)
                 setGetMenuLoadingState(ProjectInteractionState.Idle)
             }
             else {
@@ -263,7 +339,7 @@ class DetailsViewModel @Inject constructor(
             }
 
 
-
+            Log.i(TAG,">>> get menu for place ${menuList.second.size}")
         }.launchIn(viewModelScope)
     }
     fun getListOfProjectPages() {
@@ -279,6 +355,7 @@ class DetailsViewModel @Inject constructor(
                 creatorDataState.value.projectPagesList.addAll(layoutList.second.filter {
                     it.wLayoutPageName.isNotEmpty() && it.wLayoutRouteToken.isNotEmpty()
                 })
+
                 setSelectedPageToken(creatorDataState.value.projectPagesList.first().wLayoutRouteToken)
                 setGetPagesState(ProjectInteractionState.Idle)
                 getListOfMenusForPlace()
@@ -301,20 +378,30 @@ class DetailsViewModel @Inject constructor(
     }
     fun setMenuViewState(newState: ProjectMenuViewState) {
         when(creatorDataState.value.projectMenuViewState.value) {
+            /*
             is ProjectMenuViewState.Close -> {
                 creatorDataState.value = creatorDataState.value.copy(projectMenuViewState = mutableStateOf(ProjectMenuViewState.Short))
             }
+
+             */
             is ProjectMenuViewState.Short -> {
                 creatorDataState.value = creatorDataState.value.copy(projectMenuViewState = mutableStateOf(ProjectMenuViewState.Open))
             }
             is ProjectMenuViewState.Open -> {
-                creatorDataState.value = creatorDataState.value.copy(projectMenuViewState = mutableStateOf(ProjectMenuViewState.Close))
+                creatorDataState.value = creatorDataState.value.copy(projectMenuViewState = mutableStateOf(ProjectMenuViewState.Short))
             }
+            else -> {}
         }
 
     }
+    fun setReorderMenuState(newState: ProjectInteractionState) {
+        creatorDataState.value = creatorDataState.value.copy(projectReorderMenuState = mutableStateOf(newState))
+    }
     fun setInsertMenuState(newState: ProjectInteractionState) {
         creatorDataState.value = creatorDataState.value.copy(projectInsertMenuState = mutableStateOf(newState))
+    }
+    fun setDeleteMenuState(newState: ProjectInteractionState) {
+        creatorDataState.value = creatorDataState.value.copy(projectDeleteMenuState = mutableStateOf(newState))
     }
     fun setGetPagesState(newState: ProjectInteractionState) {
         creatorDataState.value = creatorDataState.value.copy(projectGetPagesState = mutableStateOf(newState))

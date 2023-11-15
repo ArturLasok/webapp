@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -38,7 +40,6 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arturlasok.feature_core.R
 import com.arturlasok.feature_core.navigation.Screen
-import com.arturlasok.feature_core.presentation.components.AlertButton
 import com.arturlasok.feature_core.presentation.components.DefaultSnackbar
 import com.arturlasok.feature_core.presentation.components.TopBack
 import com.arturlasok.feature_core.presentation.components.TopSettings
@@ -116,12 +117,42 @@ fun DetailsScreen(
                 //nothing
             }
         }
+        when(creatorDataState.projectReorderMenuState.value) {
+            is ProjectInteractionState.Error -> {
+                snackMessage(
+                    snackType = SnackType.ERROR,
+                    message =  if(detailsViewModel.haveNetwork()) {
+                        (creatorDataState.projectReorderMenuState.value as ProjectInteractionState.Error).message
+                    }
+                    else
+                    {
+                        UiText.StringResource(com.arturlasok.feature_creator.R.string.creator_nonetwork, "asd")
+                            .asString(detailsViewModel.applicationContext.applicationContext)
+                    },
+                    actionLabel = UiText.StringResource(R.string.core_ok, "asd").asString(detailsViewModel.applicationContext),
+                    snackbarController = snackbarController,
+                    scaffoldState = scaffoldState
+                )
+                detailsViewModel.setReorderMenuState(ProjectInteractionState.Idle)
+            }
+            is ProjectInteractionState.OnComplete-> {
+                Log.i(TAG, "ProjectInteractionState.OnComplete->")
+                Toast.makeText(detailsViewModel.applicationContext,UiText.StringResource(
+                    com.arturlasok.feature_creator.R.string.creator_menureordered,
+                    "asd"
+                ).asString(detailsViewModel.applicationContext), Toast.LENGTH_SHORT).show()
+                detailsViewModel.setReorderMenuState(ProjectInteractionState.Idle)
+            }
+            else -> {
+                //nothing
+            }
+        }
         when(creatorDataState.projectInsertMenuState.value) {
             is ProjectInteractionState.Error -> {
                 snackMessage(
                     snackType = SnackType.ERROR,
                     message =  if(detailsViewModel.haveNetwork()) {
-                        (creatorDataState.projectInsertMenuState as ProjectInteractionState.Error).message
+                        (creatorDataState.projectInsertMenuState.value as ProjectInteractionState.Error).message
                     }
                     else
                     {
@@ -146,6 +177,37 @@ fun DetailsScreen(
                 //nothing
             }
         }
+        when(creatorDataState.projectDeleteMenuState.value) {
+            is ProjectInteractionState.Error -> {
+                snackMessage(
+                    snackType = SnackType.ERROR,
+                    message =  if(detailsViewModel.haveNetwork()) {
+                        (creatorDataState.projectDeleteMenuState.value as ProjectInteractionState.Error).message
+                    }
+                    else
+                    {
+                        UiText.StringResource(com.arturlasok.feature_creator.R.string.creator_nonetwork, "asd")
+                            .asString(detailsViewModel.applicationContext.applicationContext)
+                    },
+                    actionLabel = UiText.StringResource(R.string.core_ok, "asd").asString(detailsViewModel.applicationContext),
+                    snackbarController = snackbarController,
+                    scaffoldState = scaffoldState
+                )
+                detailsViewModel.setDeleteMenuState(ProjectInteractionState.Idle)
+            }
+            is ProjectInteractionState.OnComplete-> {
+                Log.i(TAG, "ProjectInteractionState.OnComplete->")
+                Toast.makeText(detailsViewModel.applicationContext,UiText.StringResource(
+                    com.arturlasok.feature_creator.R.string.creator_menudeleted,
+                    "asd"
+                ).asString(detailsViewModel.applicationContext), Toast.LENGTH_SHORT).show()
+                detailsViewModel.setDeleteMenuState(ProjectInteractionState.Idle)
+            }
+            else -> {
+                //nothing
+            }
+        }
+
     })
     //Menu ADD
     when(creatorDataState.projectSelectedMenuToken.value) {
@@ -167,8 +229,9 @@ fun DetailsScreen(
             AddMenuElement(
                 darkTheme = getDarkBoolean(isSystemInDarkTheme(),dataStoreDarkTheme),
                 creatorDataState = creatorDataState,
+                iconList = detailsViewModel.iconList,
                 onDismiss = { detailsViewModel.setSelectedMenuToken("") },
-                text = UiText.StringResource(com.arturlasok.feature_creator.R.string.creator_editmenualertinfo, "asd").asString(),
+                text = com.arturlasok.feature_creator.R.string.creator_editmenualertinfo,
                 dismissOnBackPress = true,
                 dismissOnClickOutside = true,
                 setSelectedMenuToken = detailsViewModel::setSelectedMenuToken,
@@ -217,6 +280,7 @@ fun DetailsScreen(
             }
         },
         bottomBar = {
+            /*
             Column {
                 // LazyModulesRow(modulesList = detailsViewModel.getListOfWebModules())
                 Text("ProjectID: ${detailsViewModel.creatorDataState.value.projectId.value}", style = MaterialTheme.typography.h6)
@@ -227,6 +291,8 @@ fun DetailsScreen(
                 }
                 Text("page List: ${detailsViewModel.creatorDataState.value.projectPagesList.toString()}", style = MaterialTheme.typography.h6)
             }
+
+             */
         },
         drawerGesturesEnabled = false,
         drawerContent = {
@@ -262,13 +328,13 @@ fun DetailsScreen(
                 AnimatedVisibility(
                     visible = animm.value == 1,
                     exit = fadeOut(
-                        animationSpec = tween(delayMillis = 300)
+                        animationSpec = tween(delayMillis = 100)
                     ),
                     enter = fadeIn(
                         animationSpec = tween(
                             delayMillis = 0,
                             easing = FastOutSlowInEasing,
-                            durationMillis = 300
+                            durationMillis = 100
                         )
                     )
                 ) {
@@ -284,9 +350,7 @@ fun DetailsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(0.dp)
-                            //.verticalScroll(rememberScrollState())
-                            ,
+                                .padding(0.dp),
                             verticalArrangement = Arrangement.Top,
                             horizontalAlignment = Alignment.CenterHorizontally
                         )
@@ -302,12 +366,10 @@ fun DetailsScreen(
                                     setCurrentTabPosition = {},
                                     daneTab = listOf("Creator", "Details", "Preview")
                                 )
-                                //Text(text = "DETAILS")
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
                         }
                     }
-
-
                 }
 
                 val anim = remember { mutableStateOf(0) }
@@ -335,10 +397,12 @@ fun DetailsScreen(
                             navigateTo = { route -> navigateTo(route) },
                             navigateUp = { navigateUp() },
                             pageList = creatorDataState.projectPagesList,
+                            iconList = detailsViewModel.iconList,
                             creatorDataState = creatorDataState,
                             screenRefresh = detailsViewModel::screenRefresh,
                             getPagesState = creatorDataState.projectGetPagesState.value,
                             setSelectedPageToken = detailsViewModel::setSelectedPageToken,
+
 
 
 
@@ -356,10 +420,13 @@ fun DetailsScreen(
                                 navigateTo = { route -> navigateTo(route) },
                                 navigateUp = { navigateUp() },
                                 pageList = creatorDataState.projectPagesList,
+                                iconList = detailsViewModel.iconList,
                                 getPagesState = creatorDataState.projectGetPagesState.value,
                                 setAddMenu = detailsViewModel::setSelectedMenuToken,
+                                deleteOneMenu = detailsViewModel::deleteOneMenu,
                                 menuViewFraction = detailsViewModel.menuViewStateToFraction(creatorDataState.projectMenuViewState.value),
                                 setMenuViewFraction = { newState ->  detailsViewModel.setMenuViewState(newState) },
+                                reorderMenu = { detailsViewModel.saveNewMenuOrder(creatorDataState.projectPageMenuList.toList())},
                                 creatorDataState = creatorDataState
                             )
                         }

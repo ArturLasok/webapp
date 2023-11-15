@@ -7,6 +7,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,9 +52,11 @@ import com.arturlasok.feature_core.util.SnackType
 import com.arturlasok.feature_core.util.SnackbarController
 import com.arturlasok.feature_core.util.TAG
 import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_core.util.getDarkBoolean
 import com.arturlasok.feature_core.util.snackMessage
 import com.arturlasok.feature_creator.R
 import com.arturlasok.feature_creator.components.CreatorTextField
+import com.arturlasok.feature_creator.components.IconsLazyRow
 import com.arturlasok.feature_creator.components.SubmitButton
 import com.arturlasok.feature_creator.model.ProjectInteractionState
 import kotlinx.coroutines.delay
@@ -347,6 +350,15 @@ fun EditPageScreen(
                         )
                         if (editPageDataState.editPageDeleteInteractionState.value != ProjectInteractionState.Checking) {
                             if (editPageDataState.editPageInteractionState.value is ProjectInteractionState.OnComplete) {
+                                IconsLazyRow(
+                                    darkTheme = getDarkBoolean(isSystemInDarkTheme(),dataStoreDarkTheme.value),
+                                    iconsList = editPageViewModel.iconList,
+                                    selectedIconName = editPageViewModel.editPageDataState.value.editPageIconName,
+                                    setSelectedIconName = editPageViewModel::setEditPageIconName
+                                )
+                                Spacer(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(12.dp))
                                 CreatorTextField(
                                     enabled = editPageDataState.editPageInteractionState.value == ProjectInteractionState.OnComplete,
                                     isValidString = { str ->

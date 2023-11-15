@@ -1,11 +1,11 @@
-package com.arturlasok.feature_creator.presentation.creator_details
+package com.arturlasok.feature_creator.components
 
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,41 +16,51 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
 import com.arturlasok.feature_core.util.ColorType
 import com.arturlasok.feature_core.util.ExtraColors
-import com.arturlasok.feature_core.util.UiText
-import com.arturlasok.feature_creator.R
-import com.arturlasok.feature_creator.model.CreatorDataState
 
 @Composable
-fun PagesLazyRow(
+fun ModuleToolsLazyRow(
     darkTheme:Boolean,
-    creatorDataState: CreatorDataState,
-    pageList: List<WebLayout>,
-    iconList:  List<Pair<String, ImageVector>>,
-    selectedPageToken: String,
-    setSelectedPageToken:(token:String) -> Unit,
+    iconsList:List<Pair<String,ImageVector>>,
+    selectedIconName: String,
+    setSelectedIconName:(name:String) -> Unit,
+    addThisElement:(name:String) ->Unit,
 ) {
+    val selectedIndex = remember {
+        mutableStateOf(iconsList.indexOfFirst {
+            it.first == selectedIconName
+        })
+    }
     val pagesRowState = rememberLazyListState()
+    LaunchedEffect(key1 = selectedIndex.value, block = {
+        try {
+
+            pagesRowState.animateScrollToItem(selectedIndex.value)
+        }
+        catch(_:Exception) {
+
+        }
+
+    })
     LazyRow(
         state = pagesRowState,
         modifier = Modifier.padding(bottom = 0.dp)
     ) {
 
         itemsIndexed(
-            items = pageList,
-            key = { _, item -> item._id?.toString() ?: "" }
-        ) { index, onePage ->
+            items = iconsList,
+            key = { _, item -> item.first }
+        ) { index, oneIcon ->
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
@@ -59,7 +69,7 @@ fun PagesLazyRow(
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     elevation = 6.dp,
-                    color = if(selectedPageToken==onePage.wLayoutRouteToken) {
+                    color = if(selectedIconName==oneIcon.first) {
                         ExtraColors(
                             type = ColorType.DESIGNONE,
                             darktheme = darkTheme
@@ -67,13 +77,13 @@ fun PagesLazyRow(
                     } else { MaterialTheme.colors.background },
                     modifier = Modifier
                         .padding(
-                            start = 12.dp,
+                            start = 3.dp,
                             end = 0.dp,
-                            bottom = 6.dp
+                            bottom = 3.dp
                         )
                         .padding(top = 0.dp)
-                        .height(60.dp)
-                        .width(60.dp)
+                        .height(40.dp)
+                        .width(40.dp)
                 ) {
                     Column(
                         modifier = Modifier,
@@ -83,7 +93,11 @@ fun PagesLazyRow(
 
                         IconButton(
                             onClick = {
-                                setSelectedPageToken(onePage.wLayoutRouteToken)
+                                addThisElement(oneIcon.first)
+                                setSelectedIconName(oneIcon.first)
+                                selectedIndex.value = index
+
+
                             },
                             modifier = Modifier
                                 .padding(2.dp)
@@ -95,22 +109,10 @@ fun PagesLazyRow(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Icon(
-
-                                    iconList.find {
-                                        it.first == onePage.wLayoutModuleType
-                                    }?.second ?: Icons.Filled.WebAsset,
-                                    UiText.StringResource(
-                                        R.string.creator_projectPage,
-                                        "asd"
-                                    ).asString(),
+                                    oneIcon.second,
+                                    oneIcon.first,
                                     tint = MaterialTheme.colors.onBackground,
                                     modifier = Modifier.width(32.dp),
-                                )
-                                Text(
-                                    text = onePage.wLayoutPageName.uppercase()
-                                        .toString(),
-                                    style = MaterialTheme.typography.h6,
-                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -120,7 +122,7 @@ fun PagesLazyRow(
                 Spacer(
                     modifier = Modifier
                         .height(2.dp)
-                        .width(10.dp)
+                        .width(1.dp)
                 )
             }
         }

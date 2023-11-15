@@ -41,6 +41,8 @@
     <string name="creator_addPageFormError">Insert page name correctly</string>
     <string name="creator_addPageApiError">Page cannot be added at this time.</string>
     <string name="creator_addMenuApiError">Menu cannot be added at this time.</string>
+    <string name="creator_reorderMenuError">The order cannot be changed at this time</string>
+    <string name="creator_deleteMenuApiError">Menu cannot be deleted at this time.</string>
     <string name="creator_details_homescreen">Home Screen</string>
     <string name="creator_editpage_updatebutton">Update page</string>
     <string name="creator_editpage_pageUpdated">Page updated</string>
@@ -48,15 +50,21 @@
     <string name="creator_addmenu">Add menu to page</string>
     <string name="creator_addOneMenuElement">Add to menu</string>
     <string name="creator_menuadded">Menu added</string>
+    <string name="creator_menureordered">Order saved</string>
+    <string name="creator_menudeleted">Menu element deleted</string>
     <string name="creator_addmenushort">Add Menu</string>
     <string name="creator_editmenushort">Edit Menu</string>
+    <string name="creator_savemenuorder">Save new menu layout</string>
     <string name="creator_editmenualertinfo">Choose where you want this menu item to lead:</string>
+    <string name="creator_editmenualertNoRoutes">All available pages have been added to the menu</string>
     <string name="creator_addelementomenu">Add new route to menu</string>
+    <string name="creator_dragdropmenuinfo">Drag and drop items to change the order</string>
     <string name="creator_addMenuAutoLinks">Add links automatically</string>
     <string name="creator_addMenuInfoZeroPages">Please first add subpages to your project to be able to add a menu leading to these pages. At this time, the menu has nothing to lead to and cannot be added.</string>
     <string name="creator_addMenuInfo">You add a menu to the currently open page. The menu will lead to other subpages of your project. You can now automatically add links in the menu to all available subpages that you have in your project. You can also add, edit and delete them later.</string>
     <string name="creator_editpageDelete_question">Are you sure you want to delete the page and all its content?</string>
     <string name="creator_editpage_api_error">You cannot edit this page. The page is not available at the moment.</string>
+    <string name="creator_editmodule_api_error">You cannot edit this module. The module is not available at the moment.</string>
     <string name="creator_editpageinfo">You can now rename the page or delete the page and all its content.</string>
-    <string name="creator_addpageinfo">Enter the name of the subpage for your project. The name will only be visible to you and will be used to identify the site. You will be able to link the new subpage to the main page using the MENU. If you haven\'t added MENU yet, you can do it at any time in the design window.</string>
+    <string name="creator_addpageinfo">Enter the name of the subpage for your project and select icon for menu. The name will be used to identify the site. You will be able to link the new subpage to the main page using the MENU. If you haven\'t added MENU yet, you can do it at any time in the design window.</string>
 </resources>

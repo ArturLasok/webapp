@@ -46,7 +46,7 @@ fun AddMenuAlert(
         text = {
             Column {
                 Text(text,style = MaterialTheme.typography.h3, textAlign = TextAlign.Justify)
-                if(pagesNumber>0) {
+                if(pagesNumber>1) {
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()

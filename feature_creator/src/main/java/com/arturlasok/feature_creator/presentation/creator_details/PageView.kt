@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
@@ -23,18 +24,23 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MenuOpen
 import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.arturlasok.feature_core.R
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
+import com.arturlasok.feature_core.data.datasource.api.model.WebMenu
 import com.arturlasok.feature_core.navigation.Screen
 import com.arturlasok.feature_core.util.ColorType
 import com.arturlasok.feature_core.util.ExtraColors
@@ -46,21 +52,28 @@ import com.arturlasok.feature_creator.model.ProjectMenuViewState
 
 @Composable
 fun PageView(
-    darkTheme:Boolean,
-    navigateToMenuByToken:(token:String)->Unit,
+    darkTheme: Boolean,
+    navigateToMenuByToken: (token: String) -> Unit,
     navigateTo: (route: String) -> Unit,
     navigateUp: () -> Unit,
     pageList: List<WebLayout>,
     getPagesState: ProjectInteractionState,
-    setAddMenu:(str: String) -> Unit,
+    setAddMenu: (str: String) -> Unit,
     menuViewFraction: Float,
-    setMenuViewFraction:(newState: ProjectMenuViewState) -> Unit,
+    setMenuViewFraction: (newState: ProjectMenuViewState) -> Unit,
+    deleteOneMenu: (webMenu: WebMenu) -> Unit,
     creatorDataState: CreatorDataState,
+    reorderMenu:()->Unit,
+    iconList: List<Pair<String, ImageVector>>,
 ) {
-
+    val onePage = creatorDataState.projectPagesList.find {
+        it.wLayoutRouteToken == creatorDataState.projectSelectedPageToken.value
+    }
     AnimatedVisibility(
         visible = creatorDataState.projectGetPagesState.value == ProjectInteractionState.Idle
                 && creatorDataState.projectMenuLoadingState.value == ProjectInteractionState.Idle
+                && creatorDataState.projectDeleteMenuState.value == ProjectInteractionState.Idle
+                && creatorDataState.projectReorderMenuState.value == ProjectInteractionState.Idle
                 && creatorDataState.projectGetAllModulesState.value == ProjectInteractionState.Idle,
         exit = fadeOut(
             animationSpec = tween(delayMillis = 0, durationMillis = 0)
@@ -115,7 +128,7 @@ fun PageView(
                                     modifier = Modifier.clickable(onClick = { setMenuViewFraction(creatorDataState.projectMenuViewState.value) })
                                 ) {
                                     Icon(
-                                        Icons.Filled.Menu,
+                                        imageVector = if(creatorDataState.projectMenuViewState.value==ProjectMenuViewState.Short) { Icons.Filled.Menu } else { Icons.Filled.MenuOpen },
                                         UiText.StringResource(
                                             com.arturlasok.feature_creator.R.string.creator_addmenushort,
                                             "asd"
@@ -128,9 +141,7 @@ fun PageView(
                         }
                         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                             Row() {
-                                val onePage = creatorDataState.projectPagesList.find {
-                                    it.wLayoutRouteToken == creatorDataState.projectSelectedPageToken.value
-                                }
+
                                 if (onePage != null) {
                                     Text(
                                         text = onePage.wLayoutPageName.uppercase() + " [ ",
@@ -165,25 +176,6 @@ fun PageView(
                             .fillMaxWidth(fraction = menuViewFraction)
                             .fillMaxHeight()
                     ) {
-                        when(creatorDataState.projectMenuLoadingState.value) {
-                            is ProjectInteractionState.Interact -> {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(4.dp)
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                            else -> {
-                                MenuListForOnePage(
-                                    projectPageMenuList = creatorDataState.projectPageMenuList,
-                                    projectPageList = creatorDataState.projectPagesList
-                                ) { token -> navigateToMenuByToken(token) }
-                            }
-                        }
                         when(creatorDataState.projectInsertMenuState.value) {
                             is ProjectInteractionState.Interact -> {
                                 Column(
@@ -202,8 +194,8 @@ fun PageView(
                                         onClick = { setAddMenu("new") },
                                         modifier = Modifier
                                             .padding(2.dp)
-                                            .fillMaxSize()
-
+                                            .height(60.dp)
+                                            .fillMaxWidth()
                                     ) {
                                         Column(
                                             verticalArrangement = Arrangement.Center,
@@ -211,7 +203,7 @@ fun PageView(
                                         ) {
                                             Icon(
 
-                                                Icons.Filled.MenuOpen,
+                                                Icons.Filled.AddCard,
                                                 UiText.StringResource(
                                                     com.arturlasok.feature_creator.R.string.creator_addmenushort,
                                                     "asd"
@@ -230,42 +222,89 @@ fun PageView(
                                     }
                                 } else {
                                     if (creatorDataState.projectMenuViewState.value == ProjectMenuViewState.Open) {
-                                        IconButton(
-                                            onClick = { setAddMenu("addelement")},
-                                            modifier = Modifier
-                                                .padding(2.dp)
-                                                .fillMaxSize()
-
-                                        ) {
-                                            Column(
-                                                verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                                        //open menu edit
+                                        if(creatorDataState.projectPageMenuList.joinToString("-") { it._id.toString() }==
+                                            creatorDataState.projectPageOriginalSortedList.toList().map {
+                                                it._id.toString()
+                                            }.joinToString("-")
                                             ) {
-                                                Icon(
+                                            IconButton(
+                                                onClick = { setAddMenu("addelement") },
+                                                modifier = Modifier
+                                                    .padding(2.dp)
+                                                    .height(60.dp)
+                                                    .fillMaxWidth()
 
-                                                    Icons.Filled.PlaylistAdd,
-                                                    UiText.StringResource(
-                                                        com.arturlasok.feature_creator.R.string.creator_addelementomenu,
-                                                        "asd"
-                                                    ).asString(),
-                                                    tint = MaterialTheme.colors.onBackground,
-                                                    modifier = Modifier.width(32.dp),
-                                                )
-                                                Text(
-                                                    text = UiText.StringResource(
-                                                        com.arturlasok.feature_creator.R.string.creator_addelementomenu,
-                                                        "asd"
-                                                    ).asString().uppercase(),
-                                                    style = MaterialTheme.typography.h6
-                                                )
+                                            ) {
+                                                Column(
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Icon(
+
+                                                        Icons.Filled.PlaylistAdd,
+                                                        UiText.StringResource(
+                                                            com.arturlasok.feature_creator.R.string.creator_addelementomenu,
+                                                            "asd"
+                                                        ).asString(),
+                                                        tint = MaterialTheme.colors.onBackground,
+                                                        modifier = Modifier.width(32.dp),
+                                                    )
+                                                    Text(
+                                                        text = UiText.StringResource(
+                                                            com.arturlasok.feature_creator.R.string.creator_addelementomenu,
+                                                            "asd"
+                                                        ).asString().uppercase(),
+                                                        style = MaterialTheme.typography.h6
+                                                    )
+                                                }
                                             }
                                         }
+                                        else {
+                                            IconButton(
+                                                onClick = {
+                                                //save new menu
+                                                    reorderMenu()
+                                                },
+                                                modifier = Modifier
+                                                    .padding(2.dp)
+                                                    .height(60.dp)
+                                                    .fillMaxWidth()
+
+                                            ) {
+                                                Column(
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Icon(
+
+                                                        Icons.Filled.Save,
+                                                        UiText.StringResource(
+                                                            com.arturlasok.feature_creator.R.string.creator_savemenuorder,
+                                                            "asd"
+                                                        ).asString(),
+                                                        tint = MaterialTheme.colors.error,
+                                                        modifier = Modifier.width(32.dp),
+                                                    )
+                                                    Text(
+                                                        color = MaterialTheme.colors.error,
+                                                        text = UiText.StringResource(
+                                                            com.arturlasok.feature_creator.R.string.creator_savemenuorder,
+                                                            "asd"
+                                                        ).asString().uppercase(),
+                                                        style = MaterialTheme.typography.h6
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        //---
                                     } else {
                                         IconButton(
                                             onClick = { setMenuViewFraction(creatorDataState.projectMenuViewState.value) },
                                             modifier = Modifier
                                                 .padding(2.dp)
-                                                .fillMaxSize()
+                                                .height(60.dp)
+                                                .fillMaxWidth()
 
                                         ) {
                                             Column(
@@ -274,7 +313,7 @@ fun PageView(
                                             ) {
                                                 Icon(
 
-                                                    Icons.Filled.MenuOpen,
+                                                    Icons.Filled.MenuBook,
                                                     UiText.StringResource(
                                                         com.arturlasok.feature_creator.R.string.creator_editmenushort,
                                                         "asd"
@@ -299,6 +338,33 @@ fun PageView(
 
                             }
                         }
+                        when(creatorDataState.projectMenuLoadingState.value) {
+                            is ProjectInteractionState.Interact -> {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(4.dp)
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                            else -> {
+                                MenuListForOnePage(
+                                    projectPageMenuList = creatorDataState.projectPageMenuList,
+                                    projectPageList = creatorDataState.projectPagesList,
+                                    org = creatorDataState.projectPageOriginalSortedList.toList().map {
+                                        it._id.toString()
+                                    }.joinToString("-"),
+                                    enabled = creatorDataState.projectMenuViewState.value is ProjectMenuViewState.Open,
+                                    iconList = iconList,
+                                    creatorDataState = creatorDataState.projectMenuViewState,
+                                    deleteOneMenu = { webMenu ->  deleteOneMenu(webMenu)},
+                                ) { token -> navigateToMenuByToken(token) }
+                            }
+                        }
+
                     }
 
                     //Spacer
@@ -320,7 +386,12 @@ fun PageView(
                     ) {
 
                         IconButton(
-                            onClick = { },
+                            onClick = {
+                                if (onePage != null) {
+                                    navigateTo(Screen.ModuleScreen.routeWithArgs+
+                                            "?pageId=${onePage._id.toString().substringAfter("oid=").substringBefore("}")}")
+                                }
+                            },
                             modifier = Modifier
                                 .padding(2.dp)
                                 .fillMaxSize()
@@ -341,7 +412,7 @@ fun PageView(
                                     modifier = Modifier.width(32.dp),
                                 )
                                 Text(
-                                    text = "Add Module".uppercase(),
+                                    text = "Add Content".uppercase(),
                                     style = MaterialTheme.typography.h6
                                 )
                             }
@@ -356,6 +427,8 @@ fun PageView(
     if(creatorDataState.projectGetAllModulesState.value!=ProjectInteractionState.Idle
         || creatorDataState.projectGetPagesState.value!=ProjectInteractionState.Idle
         || creatorDataState.projectMenuLoadingState.value!=ProjectInteractionState.Idle
+        || creatorDataState.projectReorderMenuState.value!=ProjectInteractionState.Idle
+        || creatorDataState.projectDeleteMenuState.value!=ProjectInteractionState.Idle
         ) {
         Surface(
             shape = MaterialTheme.shapes.medium,

@@ -9,6 +9,7 @@ data class NewPageDataState(
 
     val newPageName:String = "",
     val newPageProjectId: String ="",
+    val newPageIconName: String = "Icons.Filled.WebAsset",
     val newPageInsertState: MutableState<@Contextual ProjectInteractionState>
 
 )

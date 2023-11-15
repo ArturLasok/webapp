@@ -2,7 +2,15 @@ package com.arturlasok.feature_creator.presentation.creator_addpage
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +23,7 @@ import com.arturlasok.feature_core.util.isOnline
 import com.arturlasok.feature_creator.R
 import com.arturlasok.feature_creator.model.NewPageDataState
 import com.arturlasok.feature_creator.model.ProjectInteractionState
+import com.arturlasok.feature_creator.util.IconsForPages
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -38,11 +47,15 @@ class AddPageViewModel @Inject constructor(
 
    private val newPageName = savedStateHandle.getStateFlow("newPageName","")
    private val newPageProjectId = mutableStateOf("")
+   private val newPageIconName = savedStateHandle.getStateFlow("newPageIconName","Icons.Filled.WebAsset")
+
+   val iconList = IconsForPages().returnIcons()
 
     val newPageDataState = mutableStateOf(
         NewPageDataState(
             newPageName = newPageName.value,
             newPageProjectId = newPageProjectId.value,
+            newPageIconName = newPageIconName.value,
             newPageInsertState = mutableStateOf<ProjectInteractionState>(ProjectInteractionState.Idle)
         )
     )
@@ -64,6 +77,10 @@ class AddPageViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
 
+    }
+    fun setNewPageIconName(newName: String) {
+        savedStateHandle["newPageIconName"] = newName
+        newPageDataState.value = newPageDataState.value.copy(newPageIconName= newName)
     }
     fun setNewPageProjectIdState(projectId:String) {
         newPageDataState.value = newPageDataState.value.copy(newPageProjectId = projectId)
@@ -94,6 +111,7 @@ class AddPageViewModel @Inject constructor(
         if(newPageDataState.value.newPageName.length in (1..22) && newPageDataState.value.newPageProjectId.isNotEmpty()) {
             apiInteraction.ktor_insertNewPage(
                 pageName = newPageDataState.value.newPageName,
+                pageIconName = newPageDataState.value.newPageIconName,
                 projectId = newPageDataState.value.newPageProjectId ,
                 key = getFireAuth().currentUser?.uid ?: "",
                 mail = getUserMail()

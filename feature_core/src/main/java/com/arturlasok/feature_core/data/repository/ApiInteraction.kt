@@ -3,7 +3,6 @@ package com.arturlasok.feature_core.data.repository
 
 import android.os.Build
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
 import com.arturlasok.feature_core.BuildConfig
 import com.arturlasok.feature_core.data.datasource.api.model.WebDomains
@@ -27,8 +26,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
-import org.bson.codecs.kotlinx.BsonEncoder
 import org.bson.types.ObjectId
 
 
@@ -288,10 +285,44 @@ class ApiInteraction(
             emit(WebLayout())
         }
     }
-    //Update Page Name
+    //Delete menu
+    fun ktor_deleteOneMenu(
+        menu: WebMenu,
+        key: String,
+        mail:String,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_deleteonemenu") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                            WebMenu(
+                                _id = ObjectId(menu._id.toString().substringAfter("oid=").substringBefore("}")),
+                                wMenuProjectId = ObjectId(menu.wMenuProjectId.toString().substringAfter("oid=").substringBefore("}"))
+                            )
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR delete menu: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR delete menu exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
+
+    //Delete layout
     fun ktor_deleteOneLayout(
         layId: String,
         projectId: String,
+        routeToken:String,
         key: String,
         mail:String,
     ) : Flow<Boolean> = flow {
@@ -307,7 +338,7 @@ class ApiInteraction(
                             WebLayout(
                                 _id = ObjectId(layId.substringAfter("oid=").substringBefore("}")),
                                 wLayoutProjectId = ObjectId(projectId.substringAfter("oid=").substringBefore("}")),
-                                wLayoutRouteToken ="token",
+                                wLayoutRouteToken =routeToken,
                                 wLayoutPageName = "todelete",
                                 wLayoutModule = null,
                                 wLayoutModuleType = "",
@@ -327,13 +358,43 @@ class ApiInteraction(
             emit(false)
         }
     }
+    //Update Menu Sort Order
+    fun ktor_updateMenuReorder(
+        key: String,
+        mail: String,
+        menuList: List<WebMenu>,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_updatemenusort") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                            menuList
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR update menu sort: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR update menu sort exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
     //Update Page Name
     fun ktor_updatePage(
-        pageName : String,
+        pageName: String,
         pageId: String,
         projectId: String,
         key: String,
-        mail:String,
+        mail: String,
+        pageIconName: String,
     ) : Flow<Boolean> = flow {
         try {
             //ktor update
@@ -350,7 +411,7 @@ class ApiInteraction(
                                 wLayoutRouteToken ="token",
                                 wLayoutPageName = pageName,
                                 wLayoutModule = null,
-                                wLayoutModuleType = "",
+                                wLayoutModuleType = pageIconName,
                                 wLayoutPosition = null,
                                 wLayoutSort = 0L
                             )
@@ -398,7 +459,9 @@ class ApiInteraction(
             val data = Gson().fromJson<List<WebMenu>>(response.bodyAsText(),listType)
             Log.i(TAG, "KTOR get menus: ${response.status}")
             //200 OK
-            if(response.status.value==200) { emit(Pair(true, data)) }
+            if(response.status.value==200) { emit(Pair(true, data.sortedBy {
+                it.wMenuSort
+            })) }
             else { emit(Pair(false, listOf())) }
         } catch(e:java.lang.Exception) {
             Log.i(TAG, "KTOR get menus exception: ${e.message}")
@@ -462,6 +525,7 @@ class ApiInteraction(
     //Insert new Page to ktor
     fun ktor_insertNewPage(
         pageName : String,
+        pageIconName : String,
         projectId: String,
         key: String,
         mail:String,
@@ -489,7 +553,7 @@ class ApiInteraction(
                               wLayoutRouteToken = token,
                               wLayoutPageName = pageName,
                               wLayoutModule = null,
-                              wLayoutModuleType = "",
+                              wLayoutModuleType = pageIconName,
                               wLayoutPosition = null,
                               wLayoutSort = 0L
                         )

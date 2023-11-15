@@ -29,7 +29,7 @@ import com.arturlasok.feature_creator.presentation.creator_addproject.AddProject
 import com.arturlasok.feature_creator.presentation.creator_details.DetailsScreen
 import com.arturlasok.feature_creator.presentation.creator_editmodule.EditModuleScreen
 import com.arturlasok.feature_creator.presentation.creator_editpage.EditPageScreen
-import com.arturlasok.feature_creator.presentation.creator_newmodule.NewModuleScreen
+import com.arturlasok.feature_creator.presentation.creator_module.ModuleScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_addmessage.AddMessageScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_forgot.ForgotScreen
 import com.arturlasok.webapp.feature_auth.presentation.auth_login.LoginScreen
@@ -74,12 +74,14 @@ fun NavigationComponent(
         })
         //
         //NAV Queue
-
+/*
         Text("nav->${navHostController.backQueue.joinToString(separator = " , ") {
            it.destination.route.toString()
         }} \n Last:  ${navHostController.currentBackStackEntry?.destination?.route}", style = MaterialTheme.typography.h4)
 
 
+
+ */
     }
 
     NavHost(
@@ -587,17 +589,23 @@ fun NavigationComponent(
 
             }
         }
-        // New Module Screen
+        // Module Screen
         composable(
-            route= Screen.NewModuleScreen.route) {
+            arguments = listOf(navArgument("pageId") { defaultValue = "" }),
+            route= Screen.ModuleScreen.route) {
             Column() {
                 navTasks(navHostController = navHostController)
-                NewModuleScreen(
+                ModuleScreen(
                     isSecondScreen = false,
                     isInDualMode = false,
-                    navigateTo = { route-> navHostController.navigate(route)},
+                    pageId = it.arguments?.getString("pageId") ?: "",
+                    navigateTo = { route-> navHostController.navigate(route)
+                    {
+                        popUpTo(Screen.DetailsScreen.route) { inclusive = true }
+                    }
+                                 },
                     navigateUp = { navHostController.popBackStack()},
-                    navScreenLabel = UiText.StringResource(Screen.NewModuleScreen.label,"asd").asString(),
+                    navScreenLabel = UiText.StringResource(Screen.ModuleScreen.label,"asd").asString(),
                     modifierTopBar = modifierTopBar,
                     modifierScaffold = modifierScaffold,
                 )

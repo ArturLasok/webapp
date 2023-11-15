@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
@@ -43,12 +44,13 @@ fun PagesLazyColumn(
     navigateTo: (route: String) -> Unit,
     navigateUp: () -> Unit,
     pageList: List<WebLayout>,
+    iconList:  List<Pair<String, ImageVector>>,
     getPagesState: ProjectInteractionState,
     creatorDataState: CreatorDataState,
     screenRefresh: () -> Unit,
     setSelectedPageToken:(token:String) -> Unit,
 
-) {
+    ) {
 
     val pagesColumnState = rememberLazyListState()
     //Pages
@@ -170,7 +172,9 @@ fun PagesLazyColumn(
                                     ) {
                                         Icon(
 
-                                            Icons.Filled.WebAsset,
+                                            iconList.find {
+                                                it.first == onePage.wLayoutModuleType
+                                            }?.second ?: Icons.Filled.WebAsset,
                                             UiText.StringResource(
                                                 com.arturlasok.feature_creator.R.string.creator_projectPage,
                                                 "asd"
@@ -196,6 +200,8 @@ fun PagesLazyColumn(
                                 .background(
                                     if (creatorDataState.projectSelectedPageToken.value == onePage.wLayoutRouteToken
                                         && creatorDataState.projectGetAllModulesState.value == ProjectInteractionState.Idle
+                                        && creatorDataState.projectDeleteMenuState.value == ProjectInteractionState.Idle
+                                        && creatorDataState.projectMenuLoadingState.value == ProjectInteractionState.Idle
                                     ) {
                                         ExtraColors(
                                             type = ColorType.DESIGNONE,

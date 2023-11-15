@@ -12,10 +12,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -27,25 +27,41 @@ import com.arturlasok.feature_creator.model.CreatorDataState
 @Composable
 fun AddMenuElement(
     creatorDataState: CreatorDataState,
+    iconList:  List<Pair<String, ImageVector>>,
     onDismiss: () -> Unit,
-    text: String,
+    text: Int,
     dismissOnBackPress: Boolean,
     dismissOnClickOutside: Boolean,
     darkTheme: Boolean,
     setSelectedMenuToken:(token:String) -> Unit,
-    addRouteToThisMenu:(routeToken: String,placeToken:String) -> Unit,
+    addRouteToThisMenu:(routeToken: String, placeToken:String) -> Unit,
 
     ) {
 
     val selectedPageToken = rememberSaveable {
         mutableStateOf("")
     }
+    val pagesList = rememberSaveable {
+        creatorDataState.projectPagesList.filterNot {
+            creatorDataState.projectPageMenuList.any {menu->
+                it.wLayoutRouteToken == menu.wMenuRoute
+            }
+        }
+    }
+    val textInfo = rememberSaveable {
+        if(pagesList.isNotEmpty()) {
+            text
+        }
+        else {
+            R.string.creator_editmenualertNoRoutes
+        }
+    }
     AlertDialog(
         backgroundColor = MaterialTheme.colors.background,
         onDismissRequest = { onDismiss() },
         text = {
             Column {
-                Text(text,style = MaterialTheme.typography.h3, textAlign = TextAlign.Justify)
+                Text(UiText.StringResource(textInfo, "asd").asString(),style = MaterialTheme.typography.h3, textAlign = TextAlign.Justify)
 
                 Spacer(
                     modifier = Modifier
@@ -61,11 +77,8 @@ fun AddMenuElement(
                    PagesLazyRow(
                        darkTheme = darkTheme,
                        creatorDataState = creatorDataState,
-                       pageList = creatorDataState.projectPagesList.filterNot {
-                                                        creatorDataState.projectPageMenuList.any {menu->
-                                                              it.wLayoutRouteToken == menu.wMenuRoute
-                                                          }
-                       },
+                       pageList = pagesList,
+                       iconList = iconList,
                        selectedPageToken = selectedPageToken.value,
                        setSelectedPageToken ={ token -> selectedPageToken.value = token  }
                    )
@@ -93,20 +106,25 @@ fun AddMenuElement(
                     },
                     modifier = Modifier
                 )
-                AlertButton(
-                    buttonEnabled = selectedPageToken.value.isNotEmpty(),
-                    buttonText = UiText.StringResource(
-                        R.string.creator_addOneMenuElement,
-                        "asd"
+                if(pagesList.isNotEmpty()) {
+                    AlertButton(
+                        buttonEnabled = selectedPageToken.value.isNotEmpty(),
+                        buttonText = UiText.StringResource(
+                            R.string.creator_addOneMenuElement,
+                            "asd"
+                        )
+                            .asString(),
+                        textPadding = 2.dp,
+                        buttonAction = {
+                            setSelectedMenuToken("")
+                            addRouteToThisMenu(
+                                selectedPageToken.value,
+                                creatorDataState.projectSelectedPageToken.value
+                            )
+                        },
+                        modifier = Modifier
                     )
-                        .asString(),
-                    textPadding = 2.dp,
-                    buttonAction = {
-                        setSelectedMenuToken("")
-                        addRouteToThisMenu(selectedPageToken.value,creatorDataState.projectSelectedPageToken.value)
-                    },
-                    modifier = Modifier
-                )
+                }
             }
         },
         properties = DialogProperties(dismissOnBackPress = dismissOnBackPress,dismissOnClickOutside = dismissOnClickOutside)
