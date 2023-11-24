@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
 @Serializable
-data class WebMenuDetails(
+data class WebModuleImage(
     @Contextual
     val _id: ObjectId? = null,
-    val wMenuDetailsToken: String = "",
-    val wMenuName: String = "",
-    val wMenuSort: String = "",
-    val wMenuStyle: String = "",
-    val wMenuRoute: String = "",
-    val wMenuIcon: String = ""
+    val wImageLink: String = "",
+    val wImageBorder: String = "",
+    val wImageDesc: String = "",
+    val wImageWidth: String = "",
+    val wImagePosition: String = "",
 )

@@ -23,7 +23,6 @@ import com.arturlasok.feature_creator.model.ProjectMenuViewState
 import com.arturlasok.feature_creator.util.IconsForPages
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -75,13 +74,6 @@ class DetailsViewModel @Inject constructor(
     //name,icon,type
     private val listOfWebModules = mutableStateListOf<Triple<Int,Int,ModuleType>>()
     init {
-        listOfWebModules.add(Triple(R.string.creator_module_text,R.drawable.appbutton,ModuleType.TEXT))
-        listOfWebModules.add(Triple(R.string.creator_module_menu,R.drawable.smile,ModuleType.MENU))
-        listOfWebModules.add(Triple(R.string.creator_module_img,R.drawable.appbutton,ModuleType.IMG))
-        listOfWebModules.add(Triple(R.string.creator_module_link,R.drawable.appbutton,ModuleType.LINK))
-        listOfWebModules.add(Triple(R.string.creator_module_spacer,R.drawable.appbutton,ModuleType.SPACER))
-        listOfWebModules.add(Triple(R.string.creator_module_toplogo,R.drawable.appbutton,ModuleType.TOPLOGO))
-        listOfWebModules.add(Triple(R.string.creator_module_news,R.drawable.appbutton,ModuleType.NEWS))
 
        openProjectIdToDataState()
 

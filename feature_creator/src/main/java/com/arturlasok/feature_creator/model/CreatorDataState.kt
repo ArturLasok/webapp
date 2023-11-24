@@ -4,7 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
 import com.arturlasok.feature_core.data.datasource.api.model.WebMenu
-import com.arturlasok.feature_core.data.datasource.api.model.WebMenuDetails
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 

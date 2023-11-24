@@ -30,6 +30,7 @@ import com.arturlasok.feature_core.util.UiText
 @Composable
 fun TopBack(
     isHome: Boolean,
+    onlyName: Boolean = false,
     isSecondScreen:Boolean = false,
     isInDualMode: Boolean = false,
     routeLabel: String ="",
@@ -41,31 +42,36 @@ fun TopBack(
     } else {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if(!isSecondScreen) {
-                IconButton(
-                    onClick = { onHome() },
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(38.dp)
-                ) {
-                    Icon(
-                        Icons.Filled.Home,
-                        UiText.StringResource(R.string.core_navBack, "asd").asString(),
-                        tint = MaterialTheme.colors.onSurface,
-                    )
+                if(!onlyName) {
+                    IconButton(
+                        onClick = { onHome() },
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .width(38.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Home,
+                            UiText.StringResource(R.string.core_navBack, "asd").asString(),
+                            tint = MaterialTheme.colors.onSurface,
+                        )
 
+                    }
+                    IconButton(
+                        onClick = { onBack() },
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                            .width(38.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            UiText.StringResource(R.string.core_navBack, "asd").asString(),
+                            tint = MaterialTheme.colors.onSurface,
+                        )
+
+                    }
                 }
-                IconButton(
-                    onClick = { onBack() },
-                    modifier = Modifier
-                        .padding(end = 5.dp)
-                        .width(38.dp)
-                ) {
-                    Icon(
-                        Icons.Filled.ArrowBack,
-                        UiText.StringResource(R.string.core_navBack, "asd").asString(),
-                        tint = MaterialTheme.colors.onSurface,
-                    )
-
+                else {
+                    Spacer(modifier = Modifier.width(81.dp))
                 }
             } else { Spacer(modifier = Modifier.width(20.dp))}
             val doubleOrient = if(isInDualMode) 2 else 1

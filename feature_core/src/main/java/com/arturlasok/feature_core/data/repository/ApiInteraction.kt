@@ -9,6 +9,7 @@ import com.arturlasok.feature_core.data.datasource.api.model.WebDomains
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
 import com.arturlasok.feature_core.data.datasource.api.model.WebMenu
 import com.arturlasok.feature_core.data.datasource.api.model.WebMessage
+import com.arturlasok.feature_core.data.datasource.api.model.WebPageModule
 import com.arturlasok.feature_core.data.datasource.api.model.WebProject
 import com.arturlasok.feature_core.data.datasource.api.model.WebUser
 import com.arturlasok.feature_core.domain.model.Message
@@ -283,6 +284,141 @@ class ApiInteraction(
             Log.i(TAG, "KTOR get layouts exception: ${e.message} ${e.localizedMessage} ${e.cause}")
             //do nothing
             emit(WebLayout())
+        }
+    }
+    //sort PageModule!
+    fun ktor_sortPageModule(
+        key: String,
+        mail:String,
+        pgmList: List<Pair<String,Long>>,
+        projectId: String,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_updatemodulesort") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            "$key[key-mail]$mail",
+                            projectId,
+                            pgmList,
+                        )
+                    )
+                }
+            val json = response.body<String>()
+            Log.i(TAG, "KTOR sort update pagemodule: ${response.status} // _id: $json")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR sort update pagemodule exception: ${e.message}")
+            //do nothing
+            emit(false)
+        }
+    }
+    //insert PageModule!
+    fun ktor_insertPageModule(
+        key: String,
+        mail:String,
+        routeToken: String,
+        moduleSort:Long,
+        type: String,
+        projectId: String,
+        ) : Flow<Pair<Boolean,String>> = flow {
+        try {
+            //ktor insert
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_addpagemodule") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Pair(
+                            "$key[key-mail]$mail",
+                            WebPageModule(
+                                wProjectId = ObjectId(projectId.substringAfter("oid=").substringBefore("}")),
+                                wRouteToken = routeToken,
+                                wPageModuleType = type,
+                                wPageModuleSort = moduleSort,
+                            )
+                        )
+                    )
+                }
+            val json = response.body<String>()
+            Log.i(TAG, "KTOR insert pagemodule: ${response.status} // _id: $json")
+            //201 CREATED
+            if(response.status.value==201) { emit(Pair(true,json)) }
+            else { emit(Pair(false,"")) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR insert pagemodule exception: ${e.message}")
+            //do nothing
+            emit(Pair(false,""))
+        }
+    }
+    //Get all pagemodule from place
+    fun ktor_getPageModuleListForPage(
+        key: String,
+        mail:String,
+        routeToken:String,
+        projectId: String,
+    ) : Flow<Pair<Boolean,List<WebPageModule>>> = flow {
+        try {
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_getpagemoduleslist") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            key,
+                            mail,
+                            WebPageModule(
+                                wProjectId = ObjectId(projectId.substringAfter("oid=").substringBefore("}")),
+                                wRouteToken = routeToken
+                            )
+                        )
+                    )
+                }
+            val listType = object : TypeToken<List<WebPageModule>>() {}.type
+            val data = Gson().fromJson<List<WebPageModule>>(response.bodyAsText(),listType)
+            Log.i(TAG, "KTOR get pagemodules: ${response.status}")
+            //200 OK
+            if(response.status.value==200) { emit(Pair(true, data.sortedBy {
+                it.wPageModuleSort
+            })) }
+            else { emit(Pair(false, listOf())) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR get pagemodules exception: ${projectId} ${e.message}")
+            //do nothing
+            emit(Pair(false,listOf()))
+        }
+
+    }
+    //Delete one page module
+    fun ktor_deleteOnePageModule(
+        id: String,
+        projectId: String,
+        key: String,
+        mail:String,
+    ) : Flow<Boolean> = flow {
+        try {
+            //ktor update
+            val response: HttpResponse =
+                ktorClient.post("$baseLink/${appbase}_deleteonepagemodule") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        Triple(
+                            mail,
+                            key,
+                            Pair(projectId.substringAfter("oid=").substringBefore("}"),id)
+                        )
+                    )
+                }
+            Log.i(TAG, "KTOR delete pagemodule: ${response.status}")
+            //201 CREATED
+            if(response.status.value==201) { emit(true) }
+            else { emit(false) }
+        } catch(e:java.lang.Exception) {
+            Log.i(TAG, "KTOR delete pagemodule exception: ${e.message}")
+            //do nothing
+            emit(false)
         }
     }
     //Delete menu
