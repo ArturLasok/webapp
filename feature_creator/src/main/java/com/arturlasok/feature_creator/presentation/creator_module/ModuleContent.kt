@@ -248,7 +248,11 @@ fun ModuleContent(
                     deleteOneModule = { id-> deleteOneModule(id)},
                     updateOpenModuleId = {},
                     setOpenTextModuleText = {},
-                    setOpenTextModuleAction = {}
+                    setOpenTextModuleAction = {},
+                    makeTextModuleSnack = {},
+                    setOpenTextModuleColorAction = {},
+                    setOpenTextModuleSettings = {},
+                    setOpenTextModuleLink = {}
                 )
 
             }

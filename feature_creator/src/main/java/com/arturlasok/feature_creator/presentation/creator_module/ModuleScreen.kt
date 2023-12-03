@@ -293,7 +293,8 @@ fun ModuleScreen(
         scaffoldState = scaffoldState,
         snackbarHost = { scaffoldState.snackbarHostState },
         topBar = {
-            //Back button //Top menu
+            if(moduleDataState.projectOpenModuleId.value.isEmpty()) {
+                //Back button //Top menu
             Row(
                 modifierTopBar,
                 verticalAlignment = Alignment.CenterVertically,
@@ -308,9 +309,12 @@ fun ModuleScreen(
                         onlyName = moduleDataState.projectOpenModuleId.value.isNotEmpty(),
                         isSecondScreen = false,
                         isInDualMode = false,
-                        routeLabel = if(moduleDataState.projectOpenModuleId.value.isEmpty()) { navScreenLabel }
-                        else { UiText.StringResource(R.string.creator_moduleContent, "asd")
-                            .asString(moduleViewModel.applicationContext.applicationContext) },
+                        routeLabel = if (moduleDataState.projectOpenModuleId.value.isEmpty()) {
+                            navScreenLabel
+                        } else {
+                            UiText.StringResource(R.string.creator_moduleContent, "asd")
+                                .asString(moduleViewModel.applicationContext.applicationContext)
+                        },
                         onBack = { navigateUp() })
                     { navigateTo(Screen.StartScreen.route) }
                 }
@@ -320,7 +324,7 @@ fun ModuleScreen(
                     //TopSettings(navigateTo = { route -> navigateTo(route) })
                     //TopNetwork(isNetworkAvailable = startViewModel.haveNetwork())
                 }
-
+            }
 
             }
         },
@@ -415,7 +419,10 @@ fun ModuleScreen(
                                         else -> {
                                             EditModuleBar(
                                                 moduleDataState = moduleDataState,
-                                                updateOpenModuleId = moduleViewModel::setProjectOpenModuleId
+                                                updateOpenModuleId = moduleViewModel::setProjectOpenModuleId,
+                                                deleteOneModule = { id->
+                                                    moduleViewModel.setProjectDeletePageModuleState(ProjectInteractionState.Checking)
+                                                    moduleViewModel.setProjectModuleIdToDelete(id) }
                                             )
                                         }
 
@@ -499,7 +506,26 @@ fun ModuleScreen(
                                                         moduleViewModel.setProjectOpenModuleId("")
                                                     },
                                                     setOpenTextModuleText = moduleViewModel::setOpenTextModuleText,
-                                                    setOpenTextModuleAction = moduleViewModel::invokeOpenTextModuleAction
+                                                    setOpenTextModuleAction = moduleViewModel::setModuleTextAction,
+                                                    setOpenTextModuleColorAction = moduleViewModel::setComponentColor,
+                                                    setOpenTextModuleSettings = moduleViewModel::setComponentSettings,
+                                                    setOpenTextModuleLink = moduleViewModel::setComponentLink,
+                                                    makeTextModuleSnack = { textRes ->
+                                                        snackMessage(
+                                                            snackType = SnackType.NORMAL,
+                                                            message =
+                                                                UiText.StringResource(textRes, "asd")
+                                                                    .asString(moduleViewModel.applicationContext.applicationContext)
+                                                            ,
+                                                            actionLabel = UiText.StringResource(
+                                                                com.arturlasok.feature_core.R.string.core_ok,
+                                                                "asd"
+                                                            ).asString(moduleViewModel.applicationContext),
+                                                            snackbarController = snackbarController,
+                                                            scaffoldState = scaffoldState
+                                                        )
+
+                                                    }
                                                 )
                                             }
                                         }

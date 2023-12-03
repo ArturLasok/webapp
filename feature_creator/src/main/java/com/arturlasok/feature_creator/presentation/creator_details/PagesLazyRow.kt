@@ -35,7 +35,7 @@ import com.arturlasok.feature_creator.model.CreatorDataState
 @Composable
 fun PagesLazyRow(
     darkTheme:Boolean,
-    creatorDataState: CreatorDataState,
+    //creatorDataState: CreatorDataState,
     pageList: List<WebLayout>,
     iconList:  List<Pair<String, ImageVector>>,
     selectedPageToken: String,

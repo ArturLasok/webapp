@@ -66,6 +66,7 @@ dependencies {
     implementation(Ktor.ktorNegotiation)
     implementation(Ktor.ktorJson)
     implementation(Ktor.ktorSerialization)
+    implementation(kotlin("reflect"))
 }
 // Allow references to generated code
 kapt {

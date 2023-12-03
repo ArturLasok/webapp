@@ -3,6 +3,7 @@ package com.arturlasok.feature_creator.presentation.creator_module
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,12 +26,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.arturlasok.feature_core.util.UiText
+import com.arturlasok.feature_creator.R
 import com.arturlasok.feature_creator.model.ModuleDataState
+import com.arturlasok.feature_creator.model.ProjectInteractionState
 
 @Composable
 fun EditModuleBar(
     moduleDataState: ModuleDataState,
     updateOpenModuleId:(id: String) -> Unit,
+    deleteOneModule: (id: String) -> Unit,
 ) {
     Column(modifier = Modifier
         .height(74.dp)
@@ -89,25 +95,59 @@ fun EditModuleBar(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = { updateOpenModuleId("") }) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Row(horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Cancel,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colors.error,
-                            modifier = Modifier
-                                .width(32.dp)
-                                .zIndex(1.0f)
+                    IconButton(onClick = { updateOpenModuleId("") }) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Cancel,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colors.error,
+                                modifier = Modifier
+                                    .width(32.dp)
+                                    .zIndex(1.0f)
 
-                        )
-                        Text("Anuluj", style = MaterialTheme.typography.h5)
+                            )
+                            Text(UiText.StringResource(R.string.creator_cancel,"asd").asString(), style = MaterialTheme.typography.h5)
+                        }
+
                     }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = {
+                            deleteOneModule(
+                                moduleDataState.projectOpenModuleId.value.substringAfter("oid=")
+                                    .substringBefore("}")
+                            )
+                        },
+                        enabled = moduleDataState.projectDeletePageModuleState.value == ProjectInteractionState.Idle,
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .width(32.dp)
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
 
+                            Icon(
+                                Icons.Filled.Delete,
+                                "Icon",
+                                tint = if (moduleDataState.projectDeletePageModuleState.value == ProjectInteractionState.Idle) {
+                                    MaterialTheme.colors.error
+                                } else {
+                                    Color.DarkGray
+                                },
+                                modifier = Modifier.width(32.dp),
+                            )
+                            Text(UiText.StringResource(R.string.creator_delete,"asd").asString(), style = MaterialTheme.typography.h5)
+                        }
+                    }
                 }
-
             }
             Column(
                 modifier = Modifier.zIndex(1.0f).padding(end = 8.dp),

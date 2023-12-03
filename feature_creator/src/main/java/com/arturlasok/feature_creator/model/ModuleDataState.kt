@@ -3,7 +3,6 @@ package com.arturlasok.feature_creator.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.arturlasok.feature_core.data.datasource.api.model.WebLayout
-import com.arturlasok.feature_core.data.datasource.api.model.WebModuleText
 import com.arturlasok.feature_core.data.datasource.api.model.WebPageModule
 import com.arturlasok.feature_core.domain.model.ModuleText
 import kotlinx.serialization.Contextual
@@ -24,6 +23,8 @@ data class ModuleDataState(
     val projectDeletePageModuleState: MutableState<@Contextual ProjectInteractionState>,
     val projectModuleIdToDelete: MutableState<String>,
     val projectOpenModuleId: MutableState<String>,
+    @Contextual
+    val projectPagesList : SnapshotStateList<WebLayout>,
     @Contextual
     val projectModulesList: SnapshotStateList<WebPageModule>,
     @Contextual

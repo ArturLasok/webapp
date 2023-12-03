@@ -6,7 +6,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -55,8 +54,6 @@ fun CreatorTextField(
     { remember { mutableStateOf(true) } } else { remember { mutableStateOf(false) } }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
-
     OutlinedTextField(
         enabled = enabled,
         modifier = Modifier.padding(start = 24.dp, end = 24.dp),
